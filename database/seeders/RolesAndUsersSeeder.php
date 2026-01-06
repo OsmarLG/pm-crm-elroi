@@ -119,26 +119,26 @@ class RolesAndUsersSeeder extends Seeder
         );
         $masterUser->syncRoles(['master']);
 
-        // ADMIN
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@elroi.test', 'username' => 'admin'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $adminUser->syncRoles(['admin']);
+        // // ADMIN
+        // $adminUser = User::firstOrCreate(
+        //     ['email' => 'admin@elroi.test', 'username' => 'admin'],
+        //     [
+        //         'name' => 'Admin User',
+        //         'password' => Hash::make('password'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
+        // $adminUser->syncRoles(['admin']);
 
-        // MEMBER
-        $memberUser = User::firstOrCreate(
-            ['email' => 'member@elroi.test', 'username' => 'member'],
-            [
-                'name' => 'Member User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $memberUser->syncRoles(['member']);
+        // // MEMBER
+        // $memberUser = User::firstOrCreate(
+        //     ['email' => 'member@elroi.test', 'username' => 'member'],
+        //     [
+        //         'name' => 'Member User',
+        //         'password' => Hash::make('password'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
+        // $memberUser->syncRoles(['member']);
     }
 }
