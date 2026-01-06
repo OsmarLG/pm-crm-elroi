@@ -1,0 +1,50 @@
+[
+    {
+        "distance": 0,
+        "name": "Plaza Universidad",
+        "city": "CDMX",
+        "municipality": "Benito Juarez",
+        "address1": "Av. Universidad #1000",
+        "address2": "Col. Santa Cruz Atoyac",
+        "provinceCode": "CMX",
+        "phone": "+525593031011",
+        "website": "shasa.com",
+        "email": "",
+        "storeCode": "T001",
+        "zipCode": "03310",
+        "tags": "[\"tienda\"]",
+        "schedule": {
+            "monday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "tuesday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "wednesday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "thursday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "friday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "saturday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            },
+            "sunday": {
+                "status": "open",
+                "hours": "11:00 - 21:00"
+            }
+        },
+        "lat": 19.3670925217234,
+        "lng": -99.1659731944738,
+        "id": 2
+    }
+]

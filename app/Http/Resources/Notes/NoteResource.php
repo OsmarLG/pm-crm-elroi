@@ -15,6 +15,8 @@ class NoteResource extends JsonResource
             'folder_name' => $this->folder?->name,
             'title' => $this->title,
             'content' => $this->content,
+            'user_id' => $this->user_id,
+            'author_name' => $this->owner?->name,
             'created_at' => optional($this->created_at)->toDateTimeString(),
             'updated_at' => optional($this->updated_at)->toDateTimeString(),
         ];

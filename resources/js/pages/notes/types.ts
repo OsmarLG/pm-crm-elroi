@@ -15,6 +15,7 @@ export type Note = {
   title: string
   content: string
   folder_id: string | null
+  user_id?: number
   author_name?: string
   created_at: string
   updated_at: string

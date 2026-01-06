@@ -97,7 +97,7 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
             </h1>
 
             <div className="mt-1 text-sm text-muted-foreground">
-              <span>Owner: user #{auth?.user?.id} {auth?.user?.name}</span>
+              <span>Owner: user #{note.data.user_id} name: {note.data.author_name}</span>
             </div>
 
             <div className="mt-1 ml-2 text-sm text-muted-foreground">
