@@ -43,7 +43,7 @@ class NoteController extends Controller
     {
         return Inertia::render('notes/note', [
             'note' => new NoteResource($note),
-            'canEdit' => request()->user()->can('notes.update', $note),
+            'canEdit' => request()->user()->can('notes.update', $note) && auth()->user->id === $note->user_id,
         ]);
     }
 
