@@ -32,7 +32,14 @@ function ImageZoom({ src, alt }: { src: string; alt: string }) {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="text-xs text-muted-foreground">Scroll to zoom • Drag to pan</div>
-        <Button variant="outline" size="sm" onClick={() => { setScale(1); setPos({ x: 0, y: 0 }) }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setScale(1)
+            setPos({ x: 0, y: 0 })
+          }}
+        >
           Reset
         </Button>
       </div>
@@ -40,9 +47,7 @@ function ImageZoom({ src, alt }: { src: string; alt: string }) {
       <div
         className="rounded-md border overflow-hidden bg-black/20 cursor-grab"
         onWheel={onWheel}
-        onMouseDown={(e) =>
-          setDrag({ sx: e.clientX, sy: e.clientY, bx: pos.x, by: pos.y })
-        }
+        onMouseDown={(e) => setDrag({ sx: e.clientX, sy: e.clientY, bx: pos.x, by: pos.y })}
         onMouseMove={(e) => {
           if (!drag) return
           setPos({ x: drag.bx + (e.clientX - drag.sx), y: drag.by + (e.clientY - drag.sy) })
@@ -81,6 +86,33 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
   const isOffice = ["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext)
   const isExe = ext === "exe"
 
+  const [copied, setCopied] = React.useState(false)
+
+  const onCopyUrl = async () => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(src)
+      } else {
+        // Fallback viejo
+        const el = document.createElement("textarea")
+        el.value = src
+        el.setAttribute("readonly", "true")
+        el.style.position = "absolute"
+        el.style.left = "-9999px"
+        document.body.appendChild(el)
+        el.select()
+        document.execCommand("copy")
+        document.body.removeChild(el)
+      }
+
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1200)
+    } catch {
+      // Si no se puede copiar (permisos/https), al menos abre el link
+      window.open(src, "_blank", "noopener,noreferrer")
+    }
+  }
+
   return (
     <div className="space-y-3">
       {mode === "panel" && (
@@ -92,7 +124,16 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
           </div>
 
           <div className="flex items-center gap-2">
-            {onEdit && <Button variant="outline" onClick={onEdit}>Edit</Button>}
+            {onEdit && (
+              <Button variant="outline" onClick={onEdit}>
+                Edit
+              </Button>
+            )}
+
+            <Button variant="outline" onClick={onCopyUrl}>
+              {copied ? "Copied!" : "Copy URL"}
+            </Button>
+
             <Button onClick={onDownload}>Download</Button>
           </div>
         </div>
@@ -100,9 +141,7 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
 
       {isImage && <ImageZoom src={src} alt={file.title} />}
 
-      {isPdf && (
-        <iframe src={src} className={mode === "modal" ? "w-full h-[72vh]" : "w-full h-[520px]"} />
-      )}
+      {isPdf && <iframe src={src} className={mode === "modal" ? "w-full h-[72vh]" : "w-full h-[520px]"} />}
 
       {isAudio && <AudioPlayer src={src} mime={mime} />}
 
@@ -113,9 +152,7 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
       {isOffice && (
         <div className="rounded-md border p-3 space-y-2">
           <div className="text-sm font-medium">Office document</div>
-          <div className="text-sm text-muted-foreground">
-            Preview requires conversion to PDF or external viewer.
-          </div>
+          <div className="text-sm text-muted-foreground">Preview requires conversion to PDF or external viewer.</div>
           <Button onClick={onDownload}>Download</Button>
         </div>
       )}
@@ -123,9 +160,7 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
       {isExe && (
         <div className="rounded-md border p-3 space-y-2">
           <div className="text-sm font-medium">Executable file</div>
-          <div className="text-sm text-muted-foreground">
-            Executables cannot be previewed for security reasons.
-          </div>
+          <div className="text-sm text-muted-foreground">Executables cannot be previewed for security reasons.</div>
           <Button onClick={onDownload}>Download</Button>
         </div>
       )}
