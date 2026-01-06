@@ -19,7 +19,6 @@ jobs:
           webhook_auth: ${{ secrets.WEBHOOK_AUTH }}
           data: >-
             {"commands":[
-              "cd public_html",
               "git pull",
               "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader",
               "php artisan migrate --force",
