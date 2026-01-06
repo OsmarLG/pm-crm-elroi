@@ -41,11 +41,14 @@ class NoteController extends Controller
 
     public function show(Note $note)
     {
+        $user = request()->user();
+
         return Inertia::render('notes/note', [
             'note' => new NoteResource($note),
-            'canEdit' => request()->user()->can('notes.update', $note) && auth()->user->id === $note->user_id,
+            'canEdit' => $user?->can('notes.update', $note) && $user->id === $note->user_id,
         ]);
     }
+
 
     public function downloadPdf(Note $note)
     {
