@@ -15,12 +15,21 @@ type Props = {
   mode?: "panel" | "modal"
 }
 
+/* ======================================================
+   Image zoom (images)
+====================================================== */
 function ImageZoom({ src, alt }: { src: string; alt: string }) {
   const [scale, setScale] = React.useState(1)
   const [pos, setPos] = React.useState({ x: 0, y: 0 })
-  const [drag, setDrag] = React.useState<{ sx: number; sy: number; bx: number; by: number } | null>(null)
+  const [drag, setDrag] = React.useState<{
+    sx: number
+    sy: number
+    bx: number
+    by: number
+  } | null>(null)
 
-  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v))
+  const clamp = (v: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, v))
 
   const onWheel = (e: React.WheelEvent) => {
     e.preventDefault()
@@ -31,7 +40,9 @@ function ImageZoom({ src, alt }: { src: string; alt: string }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">Scroll to zoom • Drag to pan</div>
+        <div className="text-xs text-muted-foreground">
+          Scroll to zoom • Drag to pan
+        </div>
         <Button
           variant="outline"
           size="sm"
@@ -47,10 +58,15 @@ function ImageZoom({ src, alt }: { src: string; alt: string }) {
       <div
         className="rounded-md border overflow-hidden bg-black/20 cursor-grab"
         onWheel={onWheel}
-        onMouseDown={(e) => setDrag({ sx: e.clientX, sy: e.clientY, bx: pos.x, by: pos.y })}
+        onMouseDown={(e) =>
+          setDrag({ sx: e.clientX, sy: e.clientY, bx: pos.x, by: pos.y })
+        }
         onMouseMove={(e) => {
           if (!drag) return
-          setPos({ x: drag.bx + (e.clientX - drag.sx), y: drag.by + (e.clientY - drag.sy) })
+          setPos({
+            x: drag.bx + (e.clientX - drag.sx),
+            y: drag.by + (e.clientY - drag.sy),
+          })
         }}
         onMouseUp={() => setDrag(null)}
         onMouseLeave={() => setDrag(null)}
@@ -69,7 +85,16 @@ function ImageZoom({ src, alt }: { src: string; alt: string }) {
   )
 }
 
-export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Props) {
+/* ======================================================
+   File Viewer
+====================================================== */
+export function FileViewer({
+  file,
+  src,
+  onDownload,
+  onEdit,
+  mode = "panel",
+}: Props) {
   const mime = file.mime_type ?? ""
   const ext = (file.original_name?.split(".").pop() ?? "").toLowerCase()
 
@@ -86,16 +111,23 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
   const isOffice = ["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext)
   const isExe = ext === "exe"
 
+  /* ======================================================
+     Copy URL (absolute)
+  ====================================================== */
   const [copied, setCopied] = React.useState(false)
+
+  const absoluteUrl = React.useMemo(() => {
+    if (typeof window === "undefined") return src
+    return new URL(src, window.location.origin).toString()
+  }, [src])
 
   const onCopyUrl = async () => {
     try {
       if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(src)
+        await navigator.clipboard.writeText(absoluteUrl)
       } else {
-        // Fallback viejo
         const el = document.createElement("textarea")
-        el.value = src
+        el.value = absoluteUrl
         el.setAttribute("readonly", "true")
         el.style.position = "absolute"
         el.style.left = "-9999px"
@@ -106,10 +138,10 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
       }
 
       setCopied(true)
-      window.setTimeout(() => setCopied(false), 1200)
+      setTimeout(() => setCopied(false), 1200)
     } catch {
-      // Si no se puede copiar (permisos/https), al menos abre el link
-      window.open(src, "_blank", "noopener,noreferrer")
+      // fallback: abrir el archivo
+      window.open(absoluteUrl, "_blank", "noopener,noreferrer")
     }
   }
 
@@ -119,8 +151,12 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-sm text-muted-foreground">Title</div>
-            <div className="truncate text-base font-semibold">{file.title}</div>
-            <div className="truncate text-xs text-muted-foreground">{file.original_name}</div>
+            <div className="truncate text-base font-semibold">
+              {file.title}
+            </div>
+            <div className="truncate text-xs text-muted-foreground">
+              {file.original_name}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -141,18 +177,34 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
 
       {isImage && <ImageZoom src={src} alt={file.title} />}
 
-      {isPdf && <iframe src={src} className={mode === "modal" ? "w-full h-[72vh]" : "w-full h-[520px]"} />}
+      {isPdf && (
+        <iframe
+          src={src}
+          className={
+            mode === "modal"
+              ? "w-full h-[72vh]"
+              : "w-full h-[520px]"
+          }
+        />
+      )}
 
       {isAudio && <AudioPlayer src={src} mime={mime} />}
 
       {isVideo && <VideoPlayer src={src} mime={mime} />}
 
-      {isText && <TextViewer url={`/files/${file.id}/text`} title={`${ext.toUpperCase()} preview`} />}
+      {isText && (
+        <TextViewer
+          url={`/files/${file.id}/text`}
+          title={`${ext.toUpperCase()} preview`}
+        />
+      )}
 
       {isOffice && (
         <div className="rounded-md border p-3 space-y-2">
           <div className="text-sm font-medium">Office document</div>
-          <div className="text-sm text-muted-foreground">Preview requires conversion to PDF or external viewer.</div>
+          <div className="text-sm text-muted-foreground">
+            Preview requires conversion to PDF or external viewer.
+          </div>
           <Button onClick={onDownload}>Download</Button>
         </div>
       )}
@@ -160,7 +212,9 @@ export function FileViewer({ file, src, onDownload, onEdit, mode = "panel" }: Pr
       {isExe && (
         <div className="rounded-md border p-3 space-y-2">
           <div className="text-sm font-medium">Executable file</div>
-          <div className="text-sm text-muted-foreground">Executables cannot be previewed for security reasons.</div>
+          <div className="text-sm text-muted-foreground">
+            Executables cannot be previewed for security reasons.
+          </div>
           <Button onClick={onDownload}>Download</Button>
         </div>
       )}
