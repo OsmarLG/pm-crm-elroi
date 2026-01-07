@@ -10,10 +10,10 @@ import { FolderTree } from "./partials/folder-tree"
 import { NoteList } from "./partials/note-list"
 import { NoteEditor } from "./partials/note-editor"
 import { NewFolderDialog } from "./partials/new-folder-dialog"
+import { RenameFolderDialog } from "@/components/rename-folder-dialog"
 import { NoteViewer } from "./partials/note-viewer"
 import { InertiaPagination } from "@/components/data-table/inertia-pagination"
-
-import { Folder, Note, ResourceCollection, Paginated } from "./types"
+import { NoteFolder as Folder, Note, ResourceCollection, Paginated } from "./types"
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: "Notes", href: "/notes" }]
 
@@ -79,6 +79,20 @@ export default function NotesPage(props: PageProps) {
   // modal new folder
   const [newFolderOpen, setNewFolderOpen] = React.useState(false)
   const [newFolderParentId, setNewFolderParentId] = React.useState<number | null>(null)
+
+  const [renameFolderDialog, setRenameFolderDialog] = React.useState<{
+    open: boolean
+    folderId: number | null
+    initialName: string
+  }>({ open: false, folderId: null, initialName: "" })
+
+  const handleRenameFolder = (id: number, newName: string) => {
+    router.put(route('notes.folders.update', id), {
+      name: newName,
+    }, {
+      onSuccess: () => setRenameFolderDialog(p => ({ ...p, open: false }))
+    })
+  }
 
   const refresh = React.useCallback((folderId: number | null) => {
     router.get(
@@ -241,6 +255,9 @@ export default function NotesPage(props: PageProps) {
               activeFolderId={noFolderOnly ? NO_FOLDER_ID : activeFolderId}
               onSelect={onSelectFolder}
               onNewFolder={onNewFolder}
+              onRenameFolder={(id, name) => {
+                setRenameFolderDialog({ open: true, folderId: id, initialName: name })
+              }}
               onDeleteFolder={deleteFolder}
               noFolderId={NO_FOLDER_ID}
             />
@@ -250,6 +267,16 @@ export default function NotesPage(props: PageProps) {
               setOpen={setNewFolderOpen}
               parentId={newFolderParentId}
               onCreate={createFolder}
+            />
+
+            <RenameFolderDialog
+              open={renameFolderDialog.open}
+              onOpenChange={(open) =>
+                setRenameFolderDialog((p) => ({ ...p, open }))
+              }
+              folderId={renameFolderDialog.folderId}
+              initialName={renameFolderDialog.initialName}
+              onRename={handleRenameFolder}
             />
           </div>
 

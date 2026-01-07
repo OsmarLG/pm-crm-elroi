@@ -20,3 +20,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__ . '/settings.php';
+
+Route::get('/n/{uuid}', [\App\Http\Controllers\Public\PublicNoteController::class, 'show'])->name('public.note.show');
+Route::get('/f/{uuid}', [\App\Http\Controllers\Public\PublicFileController::class, 'show'])->name('public.file.show');
+Route::get('/f/{uuid}/download', [\App\Http\Controllers\Public\PublicFileController::class, 'download'])->name('public.file.download');
+Route::get('/f/{uuid}/content', [\App\Http\Controllers\Public\PublicFileController::class, 'content'])->name('public.file.content');
+

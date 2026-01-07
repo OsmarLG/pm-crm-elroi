@@ -139,6 +139,7 @@ class FileService
         $file->update([
             'title' => $data['title'],
             'folder_id' => $data['folder_id'] ?? null,
+            'visibility' => $data['visibility'] ?? $file->visibility,
         ]);
 
         return $file;

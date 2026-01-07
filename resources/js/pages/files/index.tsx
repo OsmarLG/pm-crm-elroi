@@ -11,6 +11,7 @@ import { InertiaPagination } from "@/components/data-table/inertia-pagination"
 import { FileFolder, FileItem, Paginated, ResourceCollection } from "./types"
 import { FolderTree } from "./partials/folder-tree"
 import { NewFolderDialog } from "./partials/new-folder-dialog"
+import { RenameFolderDialog } from "@/components/rename-folder-dialog"
 import { FileUploader } from "./partials/file-uploader"
 import { FileList } from "./partials/file-list"
 import { FileViewer } from "./partials/file-viewer"
@@ -65,6 +66,20 @@ export default function FilesPage(props: PageProps) {
   // modal new folder
   const [newFolderOpen, setNewFolderOpen] = React.useState(false)
   const [newFolderParentId, setNewFolderParentId] = React.useState<number | null>(null)
+
+  const [renameFolderDialog, setRenameFolderDialog] = React.useState<{
+    open: boolean
+    folderId: number | null
+    initialName: string
+  }>({ open: false, folderId: null, initialName: "" })
+
+  const handleRenameFolder = (id: number, newName: string) => {
+    router.put(route('files.folders.update', id), {
+      name: newName,
+    }, {
+      onSuccess: () => setRenameFolderDialog(p => ({ ...p, open: false }))
+    })
+  }
 
   // preview modal
   const [previewOpen, setPreviewOpen] = React.useState(false)
@@ -249,6 +264,9 @@ export default function FilesPage(props: PageProps) {
               activeFolderId={noFolderOnly ? NO_FOLDER_ID : activeFolderId}
               onSelect={onSelectFolder}
               onNewFolder={onNewFolder}
+              onRenameFolder={(id, name) => {
+                setRenameFolderDialog({ open: true, folderId: id, initialName: name })
+              }}
               onDeleteFolder={deleteFolder}
               noFolderId={NO_FOLDER_ID}
             />
@@ -258,6 +276,16 @@ export default function FilesPage(props: PageProps) {
               setOpen={setNewFolderOpen}
               parentId={newFolderParentId}
               onCreate={createFolder}
+            />
+
+            <RenameFolderDialog
+              open={renameFolderDialog.open}
+              onOpenChange={(open) =>
+                setRenameFolderDialog((p) => ({ ...p, open }))
+              }
+              folderId={renameFolderDialog.folderId}
+              initialName={renameFolderDialog.initialName}
+              onRename={handleRenameFolder}
             />
           </div>
 

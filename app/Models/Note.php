@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Note extends Model
 {
-    protected $fillable = ['user_id', 'folder_id', 'title', 'content'];
+    protected $fillable = ['user_id', 'folder_id', 'title', 'content', 'visibility', 'uuid'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Note $note) {
+            $note->uuid = (string) \Illuminate\Support\Str::uuid();
+        });
+    }
 
     public function owner(): BelongsTo
     {

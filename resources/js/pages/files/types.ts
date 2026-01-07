@@ -13,6 +13,8 @@ export type FileItem = {
   mime_type: string | null
   size: number
   created_at?: string
+  visibility?: 'private' | 'public'
+  uuid?: string
 }
 
 export type ResourceCollection<T> = { data: T[] }

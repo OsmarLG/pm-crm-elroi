@@ -18,7 +18,16 @@ class FileItem extends Model
         'path',
         'mime_type',
         'size',
+        'visibility',
+        'uuid',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (FileItem $file) {
+            $file->uuid = (string) \Illuminate\Support\Str::uuid();
+        });
+    }
 
     public function folder(): BelongsTo
     {

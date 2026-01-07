@@ -16,11 +16,9 @@ class FileResource extends JsonResource
             'mime_type' => $this->mime_type,
             'size' => $this->size,
             'created_at' => optional($this->created_at)->toISOString(),
-            'folder' => $this->whenLoaded('folder', fn () => [
-                'id' => $this->folder?->id,
-                'name' => $this->folder?->name,
-                'parent_id' => $this->folder?->parent_id,
-            ]),
+            'folder' => optional($this->folder)->only(['id', 'name', 'parent_id']),
+            'visibility' => $this->visibility,
+            'uuid' => $this->uuid,
         ];
     }
 }

@@ -116,6 +116,7 @@ class NotesService
             'folder_id' => $data['folder_id'] ?? null,
             'title' => $data['title'],
             'content' => $data['content'] ?? '',
+            'visibility' => $data['visibility'] ?? $note->visibility, // Preserve if not sent, or nullable
         ]);
 
         return $note;

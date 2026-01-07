@@ -6,6 +6,16 @@ import type { FileItem } from "../types"
 import { AudioPlayer } from "./audio-player"
 import { VideoPlayer } from "./video-player"
 import { TextViewer } from "./text-viewer"
+import { MoreVertical, Copy, Globe, Lock, Download, Edit } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 
 type Props = {
   file: FileItem
@@ -160,17 +170,68 @@ export function FileViewer({
           </div>
 
           <div className="flex items-center gap-2">
-            {onEdit && (
-              <Button variant="outline" onClick={onEdit}>
-                Edit
-              </Button>
-            )}
-
-            <Button variant="outline" onClick={onCopyUrl}>
-              {copied ? "Copied!" : "Copy URL"}
+            <Button size="sm" onClick={onDownload}>
+              <Download className="h-4 w-4 mr-2" />
+              Download
             </Button>
 
-            <Button onClick={onDownload}>Download</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+                {onEdit && (
+                  <DropdownMenuItem onClick={onEdit}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Details
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem onClick={() => {
+                  import('@inertiajs/react').then(({ router }) => {
+                    router.put(`/files/${file.id}`, {
+                      title: file.title,
+                      folder_id: file.folder_id,
+                      visibility: file.visibility === 'public' ? 'private' : 'public'
+                    }, { preserveScroll: true })
+                  })
+                }}>
+                  {file.visibility === 'public' ? (
+                    <>
+                      <Lock className="h-4 w-4 mr-2" />
+                      Make Private
+                    </>
+                  ) : (
+                    <>
+                      <Globe className="h-4 w-4 mr-2" />
+                      Make Public
+                    </>
+                  )}
+                </DropdownMenuItem>
+
+                {file.visibility === 'public' && file.uuid && (
+                  <DropdownMenuItem onClick={() => {
+                    const url = `${window.location.origin}/f/${file.uuid}`
+                    navigator.clipboard.writeText(url)
+                    toast.success('Public link copied!')
+                  }}>
+                    <Globe className="h-4 w-4 mr-2" />
+                    Copy Public Link
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={onCopyUrl}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Internal URL
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       )}

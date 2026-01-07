@@ -23,6 +23,7 @@ class FileUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'visibility' => ['sometimes', 'string', 'in:private,public'],
             'folder_id' => ['nullable', 'integer', 'exists:file_folders,id'],
         ];
     }

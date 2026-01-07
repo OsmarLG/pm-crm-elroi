@@ -10,16 +10,18 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
+  Pencil,
 } from "lucide-react"
 import type { FileFolder as Folder } from "../types"
 
 type Props = {
-  folders: Folder[] // roots con children
+  folders: Folder[]
   activeFolderId: number | null
   onSelect: (folderId: number | null) => void
   onNewFolder: (parentId: number | null) => void
+  onRenameFolder: (id: number, name: string) => void
   onDeleteFolder: (id: number, name: string) => void
-  noFolderId?: number // default 0
+  noFolderId?: number
 }
 
 function getChildren(node: Folder): Folder[] {
@@ -44,6 +46,7 @@ export function FolderTree({
   activeFolderId,
   onSelect,
   onNewFolder,
+  onRenameFolder,
   onDeleteFolder,
   noFolderId = 0,
 }: Props) {
@@ -127,6 +130,21 @@ export function FolderTree({
               title="New subfolder"
             >
               <Plus className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation()
+                onRenameFolder(id, node.name)
+              }}
+              aria-label="Rename folder"
+              title="Rename folder"
+            >
+              <Pencil className="h-4 w-4" />
             </Button>
 
             <Button

@@ -14,6 +14,7 @@ class NoteUpdateRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:120'],
             'content' => ['nullable', 'string'],
+            'visibility' => ['sometimes', 'string', 'in:private,public'],
             'folder_id' => [
                 'nullable',
                 'integer',
