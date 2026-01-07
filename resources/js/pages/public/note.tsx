@@ -1,11 +1,31 @@
 import { Head } from '@inertiajs/react';
-import type { Note } from '@/types'; // Assuming Note type exists or I need to define it locally if strict
+import React from 'react';
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-markdown-preview/markdown.css";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
+function useIsDark() {
+    const [isDark, setIsDark] = React.useState(false)
+
+    React.useEffect(() => {
+        const el = document.documentElement
+        const update = () => setIsDark(el.classList.contains("dark"))
+        update()
+
+        const obs = new MutationObserver(update)
+        obs.observe(el, { attributes: true, attributeFilter: ["class"] })
+        return () => obs.disconnect()
+    }, [])
+
+    return isDark
+}
+
 export default function PublicNote({ note }: { note: any }) {
+    const isDark = useIsDark();
+
     return (
         <div className="min-h-screen bg-white dark:bg-neutral-950 font-sans text-neutral-900 dark:text-neutral-50 selection:bg-orange-500 selection:text-white">
             <Head title={note.title} />
@@ -21,14 +41,12 @@ export default function PublicNote({ note }: { note: any }) {
                 </header>
 
                 <article className="prose dark:prose-invert max-w-none">
-                    {/* Assuming content is Markdown, we might need a markdown renderer. 
-                         For now, just displaying as text or using dangerouslySetInnerHTML if it was HTML. 
-                         User said "longText('content')". 
-                         If the previous implementation used a Markdown editor, we should likely render markdown here.
-                         However, without installing a new package, I'll display simple text or basic html if pre-rendered.
-                         Wait, the Note model defines content as 'longText'. 
-                         I'll stick to whitespace-pre-wrap for now to preserve structure. */ }
-                    <div className="whitespace-pre-wrap">{note.content}</div>
+                    <div data-color-mode={isDark ? "dark" : "light"}>
+                        <MDEditor.Markdown
+                            source={note.content || ""}
+                            style={{ background: 'transparent' }}
+                        />
+                    </div>
                 </article>
             </div>
 
