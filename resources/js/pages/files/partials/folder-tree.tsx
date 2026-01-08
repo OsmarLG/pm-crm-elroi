@@ -11,7 +11,15 @@ import {
   ChevronDown,
   ChevronRight,
   Pencil,
+  MoreHorizontal,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { FileFolder as Folder } from "../types"
 
 type Props = {
@@ -115,7 +123,52 @@ export function FolderTree({
             <span className="truncate">{node.name}</span>
           </button>
 
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 md:hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onNewFolder(id)
+                  setOpen((p) => ({ ...p, [id]: true }))
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                New subfolder
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRenameFolder(id, node.name)
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteFolder(id, node.name)
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="hidden md:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
             <Button
               type="button"
               variant="ghost"

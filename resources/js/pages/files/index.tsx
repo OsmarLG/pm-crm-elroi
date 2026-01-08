@@ -291,12 +291,16 @@ export default function FilesPage(props: PageProps) {
 
           {/* middle */}
           <div className="col-span-12 md:col-span-8 lg:col-span-4 space-y-3">
-            <FileUploader onUpload={onUpload} />
+            <FileUploader
+              folderId={noFolderOnly ? null : activeFolderId}
+              onUploadSuccess={() => refresh(noFolderOnly ? NO_FOLDER_ID : activeFolderId)}
+            />
 
             <FileList
               files={visibleFiles}
               activeFileId={activeFileId}
               onSelect={(id) => setActiveFileId(id)}
+              onEdit={onEdit}
               onPreview={onPreview}
               onDownload={onDownload}
               onDelete={onDeleteFile}

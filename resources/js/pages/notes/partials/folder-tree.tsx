@@ -11,7 +11,15 @@ import {
   ChevronDown,
   ChevronRight,
   Pencil,
+  MoreHorizontal,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { NoteFolder as Folder } from "../types"
 
 type Props = {
@@ -125,53 +133,100 @@ export function FolderTree({
           </button>
 
           {/* actions */}
+          {/* actions */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={(e) => {
-                e.stopPropagation()
-                onNewFolder(id)
-                setOpen((p) => ({ ...p, [id]: true }))
-              }}
-              aria-label="New subfolder"
-              title="New subfolder"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 md:hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onNewFolder(id)
+                    setOpen((p) => ({ ...p, [id]: true }))
+                  }}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  New subfolder
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRenameFolder(id, node.name)
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDeleteFolder(id, node.name)
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            {/* Rename Button */}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={(e) => {
-                e.stopPropagation()
-                onRenameFolder(id, node.name)
-              }}
-              aria-label="Rename folder"
-              title="Rename folder"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="hidden md:flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onNewFolder(id)
+                  setOpen((p) => ({ ...p, [id]: true }))
+                }}
+                aria-label="New subfolder"
+                title="New subfolder"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation()
-                onDeleteFolder(id, node.name)
-              }}
-              aria-label="Delete folder"
-              title="Delete folder"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRenameFolder(id, node.name)
+                }}
+                aria-label="Rename folder"
+                title="Rename folder"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-destructive hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteFolder(id, node.name)
+                }}
+                aria-label="Delete folder"
+                title="Delete folder"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 

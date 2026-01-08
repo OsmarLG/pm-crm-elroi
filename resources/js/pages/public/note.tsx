@@ -51,7 +51,7 @@ export default function PublicNote({ note }: { note: any }) {
             </div>
 
             <footer className="py-8 text-center text-sm text-neutral-400">
-                <p>Shared via our App</p>
+                <p>Shared by <a href="https://labs.elroi.cloud" className="hover:text-blue-500 transition-colors" target="_blank" rel="noopener noreferrer">ELROI Labs</a></p>
             </footer>
         </div>
     );

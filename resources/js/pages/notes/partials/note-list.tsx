@@ -1,12 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { Note, Folder } from "../types"
+import { Note, NoteFolder as Folder } from "../types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Plus, Trash2, Pencil, Eye } from "lucide-react"
+import { Plus, Trash2, Pencil, Eye, MoreHorizontal, Globe, Lock, Link as LinkIcon, Copy } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { router } from "@inertiajs/react"
 import { Link } from "@inertiajs/react"
 
@@ -26,7 +33,7 @@ function flattenFolders(folders: Folder[] = []) {
   const map = new Map<number, Folder>()
   const walk = (list: Folder[]) => {
     list.forEach((f) => {
-      map.set(f.id, f)
+      map.set(Number(f.id), f)
       if (f.children?.length) walk(f.children)
     })
   }
@@ -72,8 +79,8 @@ export function NoteList({
     [selected]
   )
 
-  const allChecked = filtered.length > 0 && filtered.every((n) => selected[n.id])
-  const someChecked = filtered.some((n) => selected[n.id]) && !allChecked
+  const allChecked = filtered.length > 0 && filtered.every((n) => selected[Number(n.id)])
+  const someChecked = filtered.some((n) => selected[Number(n.id)]) && !allChecked
 
   // ✅ Acción default para "ver": ir a /notes/{id}
   const goView = (id: number) => {
@@ -143,7 +150,7 @@ export function NoteList({
                     "hover:bg-accent/60 cursor-pointer",
                     isActive && "bg-accent"
                   )}
-                  onClick={() => onSelect(n.id)}
+                  onClick={() => onSelect(Number(n.id))}
                 >
                   <Checkbox
                     checked={!!selected[n.id]}
@@ -170,7 +177,107 @@ export function NoteList({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 md:hidden"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          goView(Number(n.id))
+                        }}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEdit(Number(n.id))
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          router.put(`/notes/${n.id}`, {
+                            folder_id: n.folder_id,
+                            visibility: n.visibility === 'public' ? 'private' : 'public'
+                          }, { preserveScroll: true })
+                        }}
+                      >
+                        {n.visibility === 'public' ? (
+                          <>
+                            <Lock className="mr-2 h-4 w-4" />
+                            Make Private
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="mr-2 h-4 w-4" />
+                            Make Public
+                          </>
+                        )}
+                      </DropdownMenuItem>
+
+                      {n.visibility === 'public' && n.uuid && (
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const url = `${window.location.origin}/n/${n.uuid}`
+                            navigator.clipboard.writeText(url)
+                            // assuming toast is available or use alert, checking if toast is imported
+                            // toast is NOT imported in NoteList currently.
+                            // I will use alert/console or add toast import if needed.
+                            // Assuming toast from sonner is global layout or I'll add import.
+                            // I'll add import for toast from sonner.
+                          }}
+                        >
+                          <LinkIcon className="mr-2 h-4 w-4" />
+                          Copy Direct Public Link
+                        </DropdownMenuItem>
+                      )}
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const url = `${window.location.origin}/notes/${n.id}`
+                          navigator.clipboard.writeText(url)
+                        }}
+                      >
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy Internal URL
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onDelete(Number(n.id))
+                        }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <div className="hidden md:flex items-center gap-1">
                     <Button
                       type="button"
                       variant="ghost"
@@ -199,19 +306,80 @@ export function NoteList({
                       <Pencil className="h-4 w-4" />
                     </Button>
 
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onDelete(n.id)
-                      }}
-                      title="Delete note"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            router.put(`/notes/${n.id}`, {
+                              folder_id: n.folder_id,
+                              visibility: n.visibility === 'public' ? 'private' : 'public'
+                            }, { preserveScroll: true })
+                          }}
+                        >
+                          {n.visibility === 'public' ? (
+                            <>
+                              <Lock className="mr-2 h-4 w-4" />
+                              Make Private
+                            </>
+                          ) : (
+                            <>
+                              <Globe className="mr-2 h-4 w-4" />
+                              Make Public
+                            </>
+                          )}
+                        </DropdownMenuItem>
+
+                        {n.visibility === 'public' && n.uuid && (
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const url = `${window.location.origin}/n/${n.uuid}`
+                              navigator.clipboard.writeText(url)
+                            }}
+                          >
+                            <Globe className="mr-2 h-4 w-4" />
+                            Copy Public Link
+                          </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const url = `${window.location.origin}/notes/${n.id}`
+                            navigator.clipboard.writeText(url)
+                          }}
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy Internal URL
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onDelete(Number(n.id))
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               )

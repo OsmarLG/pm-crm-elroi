@@ -6,7 +6,7 @@ import type { FileItem } from "../types"
 import { AudioPlayer } from "./audio-player"
 import { VideoPlayer } from "./video-player"
 import { TextViewer } from "./text-viewer"
-import { MoreVertical, Copy, Globe, Lock, Download, Edit } from "lucide-react"
+import { MoreVertical, Copy, Globe, Lock, Download, Edit, Link } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,

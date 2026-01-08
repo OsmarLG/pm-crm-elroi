@@ -15,7 +15,9 @@ use Inertia\Inertia;
 
 class FileController extends Controller
 {
-    public function __construct(protected FileService $service) {}
+    public function __construct(protected FileService $service)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -54,7 +56,7 @@ class FileController extends Controller
 
         $updated = $this->service->updateFile($file, $request->validated());
 
-        return back()->with('success', 'Updated.');
+        return back()->with('success', 'File updated.');
     }
 
     public function download(FileItem $file)

@@ -86,7 +86,7 @@ export default function PublicFile({ file, download_url }: { file: any, download
                 )}
             </div>
             <footer className="mt-8 text-center text-xs text-neutral-400">
-                <p>Shared via our App</p>
+                <p>Shared by <a href="https://labs.elroi.cloud" className="hover:text-blue-500 transition-colors" target="_blank" rel="noopener noreferrer">ELROI Labs</a></p>
             </footer>
         </div>
     );

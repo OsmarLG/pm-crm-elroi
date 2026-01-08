@@ -95,7 +95,7 @@ export function NoteEditor({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold truncate">
             {note ? `Edit note #${note.id}` : "New note"}
@@ -105,21 +105,25 @@ export function NoteEditor({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <NoteFullscreenDialog
             title={title || "Untitled"}
             content={content}
             mode="edit"
           >
-            <Button variant="outline">Fullscreen</Button>
+            <Button variant="outline" size="sm">
+              <span className="hidden sm:inline">Fullscreen</span>
+              <span className="sm:hidden text-lg">⛶</span>
+            </Button>
           </NoteFullscreenDialog>
 
-          <Button variant="outline" onClick={onCancel}>
-            <X className="h-4 w-4 mr-2" />
-            Cancel
+          <Button variant="outline" size="sm" onClick={onCancel}>
+            <X className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Cancel</span>
           </Button>
 
           <Button
+            size="sm"
             onClick={() =>
               onSave({
                 title,
@@ -129,8 +133,8 @@ export function NoteEditor({
             }
             disabled={saving || title.trim().length === 0}
           >
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? "Saving..." : "Save"}
+            <Save className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{saving ? "Saving..." : "Save"}</span>
           </Button>
         </div>
       </div>
