@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { router } from "@inertiajs/react"
 import { Link } from "@inertiajs/react"
 
 type Props = {
@@ -212,10 +211,14 @@ export function NoteList({
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation()
-                          router.put(`/notes/${n.id}`, {
-                            folder_id: n.folder_id,
-                            visibility: n.visibility === 'public' ? 'private' : 'public'
-                          }, { preserveScroll: true })
+                          import('@inertiajs/react').then(({ router }) => {
+                            router.put(`/notes/${n.id}`, {
+                              title: n.title,
+                              content: n.content,
+                              folder_id: n.folder_id,
+                              visibility: n.visibility === 'public' ? 'private' : 'public'
+                            }, { preserveScroll: true })
+                          })
                         }}
                       >
                         {n.visibility === 'public' ? (
@@ -321,10 +324,14 @@ export function NoteList({
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation()
-                            router.put(`/notes/${n.id}`, {
-                              folder_id: n.folder_id,
-                              visibility: n.visibility === 'public' ? 'private' : 'public'
-                            }, { preserveScroll: true })
+                            import('@inertiajs/react').then(({ router }) => {
+                              router.put(`/notes/${n.id}`, {
+                                title: n.title,
+                                content: n.content,
+                                folder_id: n.folder_id,
+                                visibility: n.visibility === 'public' ? 'private' : 'public'
+                              }, { preserveScroll: true })
+                            })
                           }}
                         >
                           {n.visibility === 'public' ? (
