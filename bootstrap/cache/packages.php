@@ -106,6 +106,17 @@
       0 => 'Pest\\Laravel\\PestServiceProvider',
     ),
   ),
+  'prism-php/prism' => 
+  array (
+    'aliases' => 
+    array (
+      'PrismServer' => 'Prism\\Prism\\Facades\\PrismServer',
+    ),
+    'providers' => 
+    array (
+      0 => 'Prism\\Prism\\PrismServiceProvider',
+    ),
+  ),
   'spatie/laravel-permission' => 
   array (
     'providers' => 

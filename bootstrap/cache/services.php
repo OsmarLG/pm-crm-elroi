@@ -38,10 +38,11 @@
     34 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     35 => 'Termwind\\Laravel\\TermwindServiceProvider',
     36 => 'Pest\\Laravel\\PestServiceProvider',
-    37 => 'Spatie\\Permission\\PermissionServiceProvider',
-    38 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
-    39 => 'App\\Providers\\AppServiceProvider',
-    40 => 'App\\Providers\\FortifyServiceProvider',
+    37 => 'Prism\\Prism\\PrismServiceProvider',
+    38 => 'Spatie\\Permission\\PermissionServiceProvider',
+    39 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
+    40 => 'App\\Providers\\AppServiceProvider',
+    41 => 'App\\Providers\\FortifyServiceProvider',
   ),
   'eager' => 
   array (
@@ -67,10 +68,11 @@
     19 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     20 => 'Termwind\\Laravel\\TermwindServiceProvider',
     21 => 'Pest\\Laravel\\PestServiceProvider',
-    22 => 'Spatie\\Permission\\PermissionServiceProvider',
-    23 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
-    24 => 'App\\Providers\\AppServiceProvider',
-    25 => 'App\\Providers\\FortifyServiceProvider',
+    22 => 'Prism\\Prism\\PrismServiceProvider',
+    23 => 'Spatie\\Permission\\PermissionServiceProvider',
+    24 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
+    25 => 'App\\Providers\\AppServiceProvider',
+    26 => 'App\\Providers\\FortifyServiceProvider',
   ),
   'deferred' => 
   array (

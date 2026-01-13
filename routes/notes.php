@@ -2,9 +2,16 @@
 
 use App\Http\Controllers\Notes\FolderController;
 use App\Http\Controllers\Notes\NoteController;
+use App\Http\Controllers\Notes\NoteAIController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('notes')->name('notes.')->group(function () {
+
+    Route::post('/ai/refactor', [NoteAIController::class, 'refactor'])
+        ->middleware('can:notes.update') // Assuming notes.update or similar permission, or maybe open for now?
+        // Actually, let's use standard auth for now as per controller. But middleware in group might be missing auth?
+        // web.php wraps this in ['auth', 'verified'].
+        ->name('ai.refactor');
 
     Route::get('/', [NoteController::class, 'index'])
         ->middleware('can:notes.view')

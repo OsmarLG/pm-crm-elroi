@@ -5,13 +5,15 @@ import { Head, Link, router, usePage } from "@inertiajs/react"
 import * as React from "react"
 import MDEditor from "@uiw/react-md-editor"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Edit, Save, X, MoreVertical, ChevronDown, User, Calendar, Info, FileDown } from "lucide-react"
+import { ArrowLeft, Edit, Save, X, MoreVertical, ChevronDown, User, Calendar, Info, FileDown, Sparkles, Wand2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import dayjs from "dayjs"
 import localizedFormat from "dayjs/plugin/localizedFormat"
 
 dayjs.extend(localizedFormat)
+import axios from "axios"
+import { toast } from "sonner"
 
 import {
   Collapsible,
@@ -46,6 +48,24 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
   const [title, setTitle] = React.useState(n?.title ?? "")
   const [content, setContent] = React.useState(n?.content ?? "")
   const [saving, setSaving] = React.useState(false)
+  const [refactoring, setRefactoring] = React.useState(false)
+
+  const handleRefactor = async (mode: 'refactor' | 'improve') => {
+    if (!content) return
+    setRefactoring(true)
+    try {
+      // @ts-ignore
+      const res = await axios.post(route('notes.ai.refactor'), { content, mode })
+      if (res.data?.title) setTitle(res.data.title)
+      if (res.data?.content) setContent(res.data.content)
+      toast.success(mode === 'refactor' ? 'Note refactored!' : 'Note refined & improved!')
+    } catch (e) {
+      toast.error("AI Refactor failed.")
+      console.error(e)
+    } finally {
+      setRefactoring(false)
+    }
+  }
 
   React.useEffect(() => {
     const html = document.documentElement
@@ -201,6 +221,30 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
 
               {canEdit && isEditing && (
                 <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRefactor('refactor')}
+                    disabled={refactoring || saving || !content}
+                    className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                  >
+                    <Wand2 className={`h-4 w-4 mr-2 ${refactoring ? 'animate-spin' : ''}`} />
+                    Refactor
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRefactor('improve')}
+                    disabled={refactoring || saving || !content}
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                  >
+                    <Sparkles className={`h-4 w-4 mr-2 ${refactoring ? 'animate-spin' : ''}`} />
+                    Improve
+                  </Button>
+
+                  <div className="w-px h-6 bg-border mx-1" />
+
                   <Button variant="outline" onClick={onCancelEdit} disabled={saving}>
                     <X className="h-4 w-4 mr-2" />
                     Cancel

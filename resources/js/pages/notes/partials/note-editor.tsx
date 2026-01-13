@@ -5,7 +5,9 @@ import MDEditor from "@uiw/react-md-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Save, X } from "lucide-react"
+import { Save, X, Wand2, Sparkles } from "lucide-react"
+import { toast } from "sonner"
+import axios from "axios"
 import { NoteFullscreenDialog } from "./note-fullscreen-dialog"
 
 import {
@@ -62,6 +64,24 @@ export function NoteEditor({
   const [selectedFolderId, setSelectedFolderId] = React.useState<number | null>(
     note?.folder_id ?? folderId ?? null
   )
+  const [refactoring, setRefactoring] = React.useState(false)
+
+  const handleRefactor = async (mode: 'refactor' | 'improve') => {
+    if (!content) return
+    setRefactoring(true)
+    try {
+      // @ts-ignore
+      const res = await axios.post(route('notes.ai.refactor'), { content, mode })
+      if (res.data?.title) setTitle(res.data.title)
+      if (res.data?.content) setContent(res.data.content)
+      toast.success(mode === 'refactor' ? 'Note refactored!' : 'Note refined & improved!')
+    } catch (e) {
+      toast.error("AI Refactor failed.")
+      console.error(e)
+    } finally {
+      setRefactoring(false)
+    }
+  }
 
   /** 🔥 Detecta light / dark desde <html class="dark"> */
   const [colorMode, setColorMode] = React.useState<"light" | "dark">("light")
@@ -116,6 +136,28 @@ export function NoteEditor({
               <span className="sm:hidden text-lg">⛶</span>
             </Button>
           </NoteFullscreenDialog>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRefactor('refactor')}
+            disabled={refactoring || saving || !content}
+            title="Refactor format only"
+          >
+            <Wand2 className={`h-4 w-4 ${refactoring ? 'animate-spin' : ''}`} />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRefactor('improve')}
+            disabled={refactoring || saving || !content}
+            title="Refactor & Improve content"
+          >
+            <Sparkles className={`h-4 w-4 ${refactoring ? 'animate-spin' : ''}`} />
+          </Button>
+
+          <div className="w-px h-6 bg-border mx-1" />
 
           <Button variant="outline" size="sm" onClick={onCancel}>
             <X className="h-4 w-4 sm:mr-2" />
