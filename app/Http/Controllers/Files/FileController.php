@@ -17,6 +17,7 @@ class FileController extends Controller
 {
     public function __construct(protected FileService $service)
     {
+        ini_set('memory_limit', '-1');
     }
 
     public function index(Request $request)
