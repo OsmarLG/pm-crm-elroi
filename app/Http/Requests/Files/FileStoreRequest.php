@@ -11,10 +11,15 @@ class FileStoreRequest extends FormRequest
         return $this->user()->can('files.create');
     }
 
+    protected function prepareForValidation()
+    {
+        ini_set('memory_limit', '-1');
+    }
+
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:51200'], // 50MB
+            'file' => ['required', 'file', 'max:409600'], // 400MB
             'folder_id' => ['nullable', 'integer', 'exists:file_folders,id'],
             'title' => ['nullable', 'string', 'max:255'],
         ];
