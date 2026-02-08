@@ -10,6 +10,11 @@ use Inertia\Inertia;
 
 class PublicFileController extends Controller
 {
+    public function __construct()
+    {
+        ini_set('memory_limit', '-1');
+    }
+
     public function show(string $uuid)
     {
         $file = FileItem::where('uuid', $uuid)
@@ -50,7 +55,7 @@ class PublicFileController extends Controller
 
         $maxBytes = 1024 * 400; // 400KB limit
         $content = $disk->get($file->path);
-        
+
         if (strlen($content) > $maxBytes) {
             $content = substr($content, 0, $maxBytes) . "\n\n--- TRUNCATED ---";
         }
