@@ -230,6 +230,7 @@ export function NoteEditor({
           <MDEditor
             value={content}
             onChange={(v) => setContent(v ?? "")}
+            preview="edit"
             height={520}
           />
         </div>
