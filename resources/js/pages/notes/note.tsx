@@ -115,7 +115,12 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
         onFinish: () => setSaving(false),
         onSuccess: () => {
           setIsEditing(false)
+          toast.success("Note saved")
         },
+        onError: (errors) => {
+          toast.error("Failed to save note")
+          console.error(errors)
+        }
       }
     )
   }

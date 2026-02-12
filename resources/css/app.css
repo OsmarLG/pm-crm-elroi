@@ -307,3 +307,13 @@
 .wmde-markdown li {
     margin-left: 0 !important;
 }
+
+/* Fix fullscreen background transparency */
+.w-md-editor-fullscreen {
+    z-index: 1000 !important;
+    background-color: hsl(var(--background)) !important;
+}
+
+[data-color-mode="dark"] .w-md-editor-fullscreen {
+    background-color: hsl(var(--background)) !important;
+}
