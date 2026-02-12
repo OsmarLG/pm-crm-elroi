@@ -62,7 +62,7 @@ export function NoteEditor({
   const [title, setTitle] = React.useState(note?.title ?? "")
   const [content, setContent] = React.useState(note?.content ?? "")
   const [selectedFolderId, setSelectedFolderId] = React.useState<number | null>(
-    note?.folder_id ?? folderId ?? null
+    note?.folder_id ? Number(note.folder_id) : (folderId ?? null)
   )
   const [refactoring, setRefactoring] = React.useState(false)
 
@@ -104,7 +104,7 @@ export function NoteEditor({
   React.useEffect(() => {
     setTitle(note?.title ?? "")
     setContent(note?.content ?? "")
-    setSelectedFolderId(note?.folder_id ?? folderId ?? null)
+    setSelectedFolderId(note?.folder_id ? Number(note.folder_id) : (folderId ?? null))
   }, [note?.id, folderId])
 
   const options = React.useMemo(() => {
@@ -113,9 +113,9 @@ export function NoteEditor({
   }, [folders])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col h-full md:block md:h-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 shrink-0">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold truncate">
             {note ? `Edit note #${note.id}` : "New note"}
@@ -182,7 +182,7 @@ export function NoteEditor({
       </div>
 
       {/* Folder select */}
-      <div className="space-y-2">
+      <div className="space-y-2 shrink-0">
         <Label>Folder</Label>
         <Select
           value={selectedFolderId === null ? "null" : String(selectedFolderId)}
@@ -208,7 +208,7 @@ export function NoteEditor({
       </div>
 
       {/* Title */}
-      <div className="space-y-2">
+      <div className="space-y-2 shrink-0">
         <Label htmlFor="title">Title</Label>
         <Input
           id="title"
@@ -219,23 +219,23 @@ export function NoteEditor({
       </div>
 
       {/* Content */}
-      <div className="space-y-2">
-        <Label>Content</Label>
+      <div className="space-y-2 flex-1 flex flex-col min-h-0 md:block md:min-h-0">
+        <Label className="shrink-0">Content</Label>
 
         {/* ✅ EL FIX REAL */}
         <div
           data-color-mode={colorMode}
-          className="rounded-md border overflow-hidden"
+          className="rounded-md border overflow-hidden flex-1 flex flex-col md:h-[520px] md:block"
         >
           <MDEditor
             value={content}
             onChange={(v) => setContent(v ?? "")}
             preview="edit"
-            height={520}
+            height="100%"
           />
         </div>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground shrink-0">
           Tip: Usa #, ##, listas, **negritas**, etc.
         </p>
       </div>

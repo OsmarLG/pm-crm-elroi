@@ -34,8 +34,8 @@ export default function NoteCreatePage({ folders, presetFolderId }: PageProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="New Note" />
-            <div className="p-4 max-w-4xl mx-auto">
-                <div className="border rounded-md p-4 bg-card">
+            <div className="w-full min-h-[calc(100vh-4rem)] md:h-auto md:p-4 md:max-w-4xl md:mx-auto">
+                <div className="min-h-[calc(100vh-4rem)] md:min-h-0 md:border md:rounded-md p-4 md:p-6 bg-background md:bg-card flex flex-col">
                     <NoteEditor
                         note={null}
                         folders={foldersArray}

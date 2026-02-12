@@ -45,7 +45,7 @@ class PrismService
         if ($config) {
             if ($config->provider === 'gemini') {
                 $provider = Provider::Gemini;
-                $model = "gemini-1.5-flash";
+                $model = "gemini-2.5-flash";
                 // Runtime config override for Gemini
                 config(['prism.providers.gemini.api_key' => $config->api_key]);
             } elseif ($config->provider === 'openai') {
