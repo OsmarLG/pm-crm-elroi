@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import MDEditor from "@uiw/react-md-editor"
+import MDEditor, { getCommands } from "@uiw/react-md-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -66,15 +66,17 @@ export function NoteEditor({
   )
   const [refactoring, setRefactoring] = React.useState(false)
 
-  const handleRefactor = async (mode: 'refactor' | 'improve') => {
+  const handleRefactor = async (mode: "refactor" | "improve") => {
     if (!content) return
     setRefactoring(true)
     try {
       // @ts-ignore
-      const res = await axios.post(route('notes.ai.refactor'), { content, mode })
+      const res = await axios.post(route("notes.ai.refactor"), { content, mode })
       if (res.data?.title) setTitle(res.data.title)
       if (res.data?.content) setContent(res.data.content)
-      toast.success(mode === 'refactor' ? 'Note refactored!' : 'Note refined & improved!')
+      toast.success(
+        mode === "refactor" ? "Note refactored!" : "Note refined & improved!"
+      )
     } catch (e) {
       toast.error("AI Refactor failed.")
       console.error(e)
@@ -104,7 +106,9 @@ export function NoteEditor({
   React.useEffect(() => {
     setTitle(note?.title ?? "")
     setContent(note?.content ?? "")
-    setSelectedFolderId(note?.folder_id ? Number(note.folder_id) : (folderId ?? null))
+    setSelectedFolderId(
+      note?.folder_id ? Number(note.folder_id) : (folderId ?? null)
+    )
   }, [note?.id, folderId])
 
   const options = React.useMemo(() => {
@@ -120,9 +124,7 @@ export function NoteEditor({
           <h2 className="text-lg font-semibold truncate">
             {note ? `Edit note #${note.id}` : "New note"}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Markdown supported.
-          </p>
+          <p className="text-sm text-muted-foreground">Markdown supported.</p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -130,6 +132,9 @@ export function NoteEditor({
             title={title || "Untitled"}
             content={content}
             mode="edit"
+            onSave={({ title, content }) =>
+              onSave({ title, content, folder_id: selectedFolderId })
+            }
           >
             <Button variant="outline" size="sm">
               <span className="hidden sm:inline">Fullscreen</span>
@@ -140,21 +145,23 @@ export function NoteEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleRefactor('refactor')}
+            onClick={() => handleRefactor("refactor")}
             disabled={refactoring || saving || !content}
             title="Refactor format only"
           >
-            <Wand2 className={`h-4 w-4 ${refactoring ? 'animate-spin' : ''}`} />
+            <Wand2 className={`h-4 w-4 ${refactoring ? "animate-spin" : ""}`} />
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleRefactor('improve')}
+            onClick={() => handleRefactor("improve")}
             disabled={refactoring || saving || !content}
             title="Refactor & Improve content"
           >
-            <Sparkles className={`h-4 w-4 ${refactoring ? 'animate-spin' : ''}`} />
+            <Sparkles
+              className={`h-4 w-4 ${refactoring ? "animate-spin" : ""}`}
+            />
           </Button>
 
           <div className="w-px h-6 bg-border mx-1" />
@@ -166,17 +173,13 @@ export function NoteEditor({
 
           <Button
             size="sm"
-            onClick={() =>
-              onSave({
-                title,
-                content,
-                folder_id: selectedFolderId,
-              })
-            }
+            onClick={() => onSave({ title, content, folder_id: selectedFolderId })}
             disabled={saving || title.trim().length === 0}
           >
             <Save className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">{saving ? "Saving..." : "Save"}</span>
+            <span className="hidden sm:inline">
+              {saving ? "Saving..." : "Save"}
+            </span>
           </Button>
         </div>
       </div>
@@ -222,7 +225,6 @@ export function NoteEditor({
       <div className="space-y-2 flex-1 flex flex-col min-h-0 md:block md:min-h-0">
         <Label className="shrink-0">Content</Label>
 
-        {/* ✅ EL FIX REAL */}
         <div
           data-color-mode={colorMode}
           className="rounded-md border overflow-hidden flex-1 flex flex-col md:h-[520px] md:block"
@@ -232,6 +234,7 @@ export function NoteEditor({
             onChange={(v) => setContent(v ?? "")}
             preview="edit"
             height="100%"
+            commands={[...getCommands().filter((cmd) => cmd.name !== "fullscreen")]}
           />
         </div>
 

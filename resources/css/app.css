@@ -317,3 +317,10 @@
 [data-color-mode="dark"] .w-md-editor-fullscreen {
     background-color: hsl(var(--background)) !important;
 }
+
+.w-md-editor,
+.w-md-editor-content,
+.w-md-editor-text,
+.w-md-editor-preview {
+    height: 100% !important;
+}
