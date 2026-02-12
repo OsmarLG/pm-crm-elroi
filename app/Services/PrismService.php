@@ -35,9 +35,30 @@ class PrismService
 
         $prompt = "Por favor, procesa la siguiente nota:\n\n" . $content;
 
+        $config = \App\Models\AiConfiguration::where('is_active', true)->first();
+
+        // Default to OpenAI if nothing is configured
+        $provider = Provider::OpenAI;
+        $model = "gpt-4o-mini";
+        $apiKey = config('prism.providers.openai.api_key');
+
+        if ($config) {
+            if ($config->provider === 'gemini') {
+                $provider = Provider::Gemini;
+                $model = "gemini-1.5-flash";
+                // Runtime config override for Gemini
+                config(['prism.providers.gemini.api_key' => $config->api_key]);
+            } elseif ($config->provider === 'openai') {
+                $provider = Provider::OpenAI;
+                $model = "gpt-4o-mini";
+                // Runtime config override for OpenAI
+                config(['prism.providers.openai.api_key' => $config->api_key]);
+            }
+        }
+
         try {
             $response = Prism::structured()
-                ->using(Provider::OpenAI, $model)
+                ->using($provider, $model)
                 ->withSystemPrompt($systemPrompt)
                 ->withPrompt($prompt)
                 ->withSchema($schema)

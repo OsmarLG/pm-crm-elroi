@@ -71,7 +71,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Route::delete('/permissions/bulk', [RolesController::class, 'permissionsBulkDestroy'])->name('permissions.bulkDestroy');
             // Route::put('/permissions/{permission}', [RolesController::class, 'permissionsUpdate'])->name('permissions.update');
             // Route::delete('/permissions/{permission}', [RolesController::class, 'permissionsDestroy'])->name('permissions.destroy');
-
+    
             // ---------- Permissions list (AJAX)
             Route::get('/permissions/list', [RolesController::class, 'permissionsList'])->name('permissions.list');
 
@@ -88,4 +88,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/{role}', [RolesController::class, 'update'])->name('update');
             Route::delete('/{role}', [RolesController::class, 'destroy'])->name('destroy');
         });
+
+    /**
+     * AI Settings
+     */
+    Route::prefix('settings/ai')->name('settings.ai.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AiSettingsController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\AiSettingsController::class, 'update'])->name('update');
+    });
 });

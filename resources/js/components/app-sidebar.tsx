@@ -14,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, KeyRound, LayoutGrid, ShieldCheck, UserCog, Users, Notebook, NotebookText, Shield } from 'lucide-react';
+import { BookOpen, Folder, KeyRound, LayoutGrid, ShieldCheck, UserCog, Users, Notebook, NotebookText, Shield, Settings2, Bot } from 'lucide-react';
 import AppLogo from './app-logo';
 import { usePage } from '@inertiajs/react';
 import { filterNavItems } from "@/utils/filter-nav-items";
@@ -71,6 +71,18 @@ const adminNavItems: NavItem[] = [
                 href: "/admin/roles/permissions",
                 icon: KeyRound,
                 can: "permissions.manage",
+            },
+        ],
+    },
+    {
+        title: "Settings",
+        icon: Settings2,
+        href: "/admin/settings/ai",
+        children: [
+            {
+                title: "AI Integration",
+                href: "/admin/settings/ai",
+                icon: Bot,
             },
         ],
     },
