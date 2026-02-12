@@ -17,6 +17,10 @@ Route::prefix('notes')->name('notes.')->group(function () {
         ->middleware('can:notes.view')
         ->name('index');
 
+    Route::get('/create', [NoteController::class, 'create'])
+        ->middleware('can:notes.create')
+        ->name('create');
+
     Route::post('/', [NoteController::class, 'store'])
         ->middleware('can:notes.create')
         ->name('store');
@@ -30,6 +34,10 @@ Route::prefix('notes')->name('notes.')->group(function () {
     Route::get('/{note}/pdf', [NoteController::class, 'downloadPdf'])
         ->middleware('can:notes.view')
         ->name('pdf');
+
+    Route::get('/{note}/edit', [NoteController::class, 'edit'])
+        ->middleware('can:notes.update')
+        ->name('edit');
 
     Route::put('/{note}', [NoteController::class, 'update'])
         ->middleware('can:notes.update')

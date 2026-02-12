@@ -16,7 +16,9 @@ use Illuminate\Support\Str;
 
 class NoteController extends Controller
 {
-    public function __construct(protected NotesService $service) {}
+    public function __construct(protected NotesService $service)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -65,10 +67,21 @@ class NoteController extends Controller
 
     public function create(Request $request)
     {
-        // opcional: preseleccionar folder
-        return Inertia::render('notes/index', [
-            'openCreate' => true,
+        $folders = $this->service->folderTree();
+
+        return Inertia::render('notes/create', [
+            'folders' => FolderResource::collection($folders),
             'presetFolderId' => $request->query('folder_id'),
+        ]);
+    }
+
+    public function edit(Note $note)
+    {
+        $folders = $this->service->folderTree();
+
+        return Inertia::render('notes/edit', [
+            'note' => new NoteResource($note),
+            'folders' => FolderResource::collection($folders),
         ]);
     }
 

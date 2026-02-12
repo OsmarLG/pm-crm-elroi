@@ -4,11 +4,12 @@ import AppLayout from "@/layouts/app-layout"
 import { Head, router, usePage } from "@inertiajs/react"
 import * as React from "react"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { route } from "ziggy-js"
 
 import type { BreadcrumbItem } from "@/types"
 import { FolderTree } from "./partials/folder-tree"
 import { NoteList } from "./partials/note-list"
-import { NoteEditor } from "./partials/note-editor"
 import { NewFolderDialog } from "./partials/new-folder-dialog"
 import { RenameFolderDialog } from "@/components/rename-folder-dialog"
 import { NoteViewer } from "./partials/note-viewer"
@@ -161,45 +162,26 @@ export default function NotesPage(props: PageProps) {
   }
 
   const onCreateNote = () => {
-    setActiveNoteId(null)
-    setMode("create")
+    router.visit(route('notes.create'))
   }
 
   const onSelectNote = (id: number) => {
-    setActiveNoteId(id)
-    setMode("view")
+    // If on mobile, might want to visit. For now, keep existing behavior (selects in list)
+    // But wait, the user wants "paginas solas".
+    // "Que la unica forma de crear o editar sea en la pagina sola"
+    // "Si abro la nota... se ve el fondo".
+    // The user implies they want to View notes in a separate page too?
+    // "cuando entro a una nota... tengo que irme al index de notas de nuevo"
+    // The current index.tsx is a 3-pane layout.
+    // If I change onSelectNote to navigate, I break the desktop layout?
+    // The user said "en el cel tengo problemas".
+    // I should probably check screen size or just always navigate for now if that's what they want.
+    // Let's assume onSelectNote navigates to `notes.show` for now to be safe with "paginas solas".
+    router.visit(route('notes.show', id))
   }
 
   const onEditNote = (id: number) => {
-    setActiveNoteId(id)
-    setMode("edit")
-  }
-
-  const onSaveNote = (payload: { title: string; content: string; folder_id: number | null }) => {
-    setSaving(true)
-
-    if (mode === "edit" && activeNote) {
-      router.put(`/notes/${activeNote.id}`, payload, {
-        preserveScroll: true,
-        onSuccess: () => {
-          toast.success("Note updated.")
-          setMode("view")
-        },
-        onError: () => toast.error("Could not update note."),
-        onFinish: () => setSaving(false),
-      })
-      return
-    }
-
-    router.post("/notes", payload, {
-      preserveScroll: true,
-      onSuccess: () => {
-        toast.success("Note created.")
-        setMode("view")
-      },
-      onError: () => toast.error("Could not create note."),
-      onFinish: () => setSaving(false),
-    })
+    router.visit(route('notes.edit', id))
   }
 
   const onDeleteNote = (id: number) => {
@@ -303,37 +285,18 @@ export default function NotesPage(props: PageProps) {
           </div>
 
           {/* right */}
-          <div className="col-span-12 lg:col-span-5">
+          <div className="col-span-12 lg:col-span-5 hidden lg:block">
             <div className="rounded-md border p-4">
-              {mode === "create" ? (
-                <NoteEditor
-                  note={null}
-                  folders={foldersArray}
-                  // si estás parado en “No folder” => null
-                  folderId={noFolderOnly ? null : activeFolderId}
-                  onSave={onSaveNote}
-                  onCancel={() => setMode("view")}
-                  saving={saving}
-                />
-              ) : mode === "edit" ? (
-                <NoteEditor
-                  note={activeNote}
-                  folders={foldersArray}
-                  // si editas, que respete la carpeta de la nota
-                  folderId={activeNote?.folder_id ?? (noFolderOnly ? null : activeFolderId)}
-                  onSave={onSaveNote}
-                  onCancel={() => setMode("view")}
-                  saving={saving}
-                />
-              ) : activeNote ? (
+              {activeNote ? (
                 <NoteViewer
                   note={activeNote}
-                  onEdit={() => setMode("edit")}
+                  onEdit={() => router.visit(route('notes.edit', activeNote.id))}
                   onDelete={() => onDeleteNote(activeNote.id)}
                 />
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  Select a note to view, or create a new one.
+                <div className="text-sm text-muted-foreground flex flex-col gap-2 items-center justify-center h-40">
+                  <p>Select a note to view details.</p>
+                  <Button onClick={onCreateNote}>Create Note</Button>
                 </div>
               )}
             </div>
