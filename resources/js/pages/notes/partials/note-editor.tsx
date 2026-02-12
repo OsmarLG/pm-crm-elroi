@@ -115,9 +115,9 @@ export function NoteEditor({
   )
 
   return (
-    <div className="space-y-4 flex flex-col h-full md:block md:h-auto">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 shrink-0">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold truncate">
             {note ? `Edit note #${note.id}` : "New note"}
@@ -179,7 +179,7 @@ export function NoteEditor({
       </div>
 
       {/* Folder select */}
-      <div className="space-y-2 shrink-0">
+      <div className="space-y-2">
         <Label>Folder</Label>
         <Select
           value={selectedFolderId === null ? "null" : String(selectedFolderId)}
@@ -203,7 +203,7 @@ export function NoteEditor({
       </div>
 
       {/* Title */}
-      <div className="space-y-2 shrink-0">
+      <div className="space-y-2">
         <Label htmlFor="title">Title</Label>
         <Input
           id="title"
@@ -213,25 +213,24 @@ export function NoteEditor({
         />
       </div>
 
-      {/* Content */}
-      <div className="space-y-2 flex-1 flex flex-col min-h-0 md:block md:min-h-0">
-        <Label className="shrink-0">Content</Label>
+      <div className="space-y-2">
+        <Label>Content</Label>
 
-        <div
-          data-color-mode={colorMode}
-          className="rounded-md border overflow-hidden flex-1 flex flex-col md:h-[520px] md:block"
-        >
+        <div data-color-mode={colorMode} className="rounded-md border overflow-hidden">
           <MDEditor
             value={content}
             onChange={(v) => setContent(v ?? "")}
-            preview="edit"
-            height="100%"
+            preview="live"
+            height={600}
             commands={commands}
             extraCommands={extraCommands}
+            textareaProps={{
+              className: "font-mono",
+            }}
           />
         </div>
 
-        <p className="text-xs text-muted-foreground shrink-0">
+        <p className="text-xs text-muted-foreground">
           Tip: Usa #, ##, listas, **negritas**, etc.
         </p>
       </div>

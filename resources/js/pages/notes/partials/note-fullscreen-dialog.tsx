@@ -113,15 +113,18 @@ export function NoteFullscreenDialog({
                     </div>
 
                     {/* Body */}
-                    <div className="flex-1 min-h-0 bg-background">
+                    <div className="bg-background" style={{ height: 'calc(100vh - 3.5rem)' }}>
                         <div className="h-full" data-color-mode={colorMode}>
                             <MDEditor
                                 value={localContent}
                                 onChange={(v) => setLocalContent(v ?? "")}
-                                preview={mode}
+                                preview="live"
                                 height="100%"
                                 commands={commands}
                                 extraCommands={extraCommands}
+                                textareaProps={{
+                                    className: "font-mono",
+                                }}
                             />
                         </div>
                     </div>
