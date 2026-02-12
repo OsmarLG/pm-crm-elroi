@@ -38,6 +38,21 @@ export function NoteFullscreenDialog({
         }
     }, [open])
 
+    /** 🔥 Detecta light / dark desde <html class="dark"> */
+    const [colorMode, setColorMode] = React.useState<"light" | "dark">("light")
+
+    React.useEffect(() => {
+        if (!open) return
+
+        const html = document.documentElement
+        const syncTheme = () => setColorMode(html.classList.contains("dark") ? "dark" : "light")
+        syncTheme()
+
+        const observer = new MutationObserver(syncTheme)
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] })
+        return () => observer.disconnect()
+    }, [open])
+
     // ✅ elimina FULLSCREEN nativo de uiw tanto en toolbar como extra toolbar
     const commands = React.useMemo(
         () => getCommands().filter((cmd) => cmd.name !== "fullscreen"),
@@ -98,8 +113,8 @@ export function NoteFullscreenDialog({
                     </div>
 
                     {/* Body */}
-                    <div className="flex-1 min-h-0">
-                        <div className="h-full">
+                    <div className="flex-1 min-h-0 bg-background">
+                        <div className="h-full" data-color-mode={colorMode}>
                             <MDEditor
                                 value={localContent}
                                 onChange={(v) => setLocalContent(v ?? "")}
