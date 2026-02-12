@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import MDEditor, { getCommands } from "@uiw/react-md-editor"
+import MDEditor, { getCommands, getExtraCommands } from "@uiw/react-md-editor"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogOverlay, DialogTrigger } from "@/components/ui/dialog"
 import { X, Save } from "lucide-react"
 
 type Props = {
@@ -28,62 +28,90 @@ export function NoteFullscreenDialog({
     React.useEffect(() => setLocalTitle(title), [title])
     React.useEffect(() => setLocalContent(content), [content])
 
+    // ✅ Bloquea scroll del body mientras está abierto
+    React.useEffect(() => {
+        if (!open) return
+        const prev = document.body.style.overflow
+        document.body.style.overflow = "hidden"
+        return () => {
+            document.body.style.overflow = prev
+        }
+    }, [open])
+
+    // ✅ elimina FULLSCREEN nativo de uiw tanto en toolbar como extra toolbar
+    const commands = React.useMemo(
+        () => getCommands().filter((cmd) => cmd.name !== "fullscreen"),
+        []
+    )
+    const extraCommands = React.useMemo(
+        () => getExtraCommands().filter((cmd) => cmd.name !== "fullscreen"),
+        []
+    )
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+            <DialogPrimitive.Trigger asChild>{children}</DialogPrimitive.Trigger>
 
-            <DialogOverlay className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50" />
+            <DialogPrimitive.Portal>
+                <DialogPrimitive.Overlay className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999]" />
 
-            <DialogContent
-                className="
-          fixed inset-0 z-50
-          w-screen h-screen max-w-none
-          p-0 border-0 rounded-none
-          bg-background
-          flex flex-col
-        "
-            >
-                {/* Header */}
-                <div className="h-14 shrink-0 px-4 border-b flex items-center justify-between">
-                    <div className="min-w-0">
-                        <div className="text-sm font-medium truncate">
-                            {localTitle || "Untitled"}
+                <DialogPrimitive.Content
+                    className="
+            fixed inset-0 z-[10000]
+            w-screen h-screen
+            bg-background
+            p-0 m-0 border-0 rounded-none
+            flex flex-col
+          "
+                >
+                    {/* Header */}
+                    <div className="h-14 shrink-0 px-4 border-b flex items-center justify-between">
+                        <div className="min-w-0">
+                            <div className="text-sm font-medium truncate">
+                                {localTitle || "Untitled"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                                Markdown supported
+                            </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                            Markdown supported
-                        </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                        {onSave && (
+                        <div className="flex items-center gap-2">
+                            {onSave && (
+                                <Button
+                                    size="sm"
+                                    onClick={() => onSave({ title: localTitle, content: localContent })}
+                                >
+                                    <Save className="h-4 w-4 mr-2" />
+                                    Save
+                                </Button>
+                            )}
+
                             <Button
-                                size="sm"
-                                onClick={() => onSave({ title: localTitle, content: localContent })}
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setOpen(false)}
+                                aria-label="Close"
                             >
-                                <Save className="h-4 w-4 mr-2" />
-                                Save
+                                <X className="h-5 w-5" />
                             </Button>
-                        )}
-
-                        <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
-                            <X className="h-5 w-5" />
-                        </Button>
+                        </div>
                     </div>
-                </div>
 
-                {/* Body */}
-                <div className="flex-1 min-h-0">
-                    <div className="h-full">
-                        <MDEditor
-                            value={localContent}
-                            onChange={(v) => setLocalContent(v ?? "")}
-                            preview={mode}
-                            height="100%"
-                            commands={[...getCommands().filter((cmd) => cmd.name !== "fullscreen")]}
-                        />
+                    {/* Body */}
+                    <div className="flex-1 min-h-0">
+                        <div className="h-full">
+                            <MDEditor
+                                value={localContent}
+                                onChange={(v) => setLocalContent(v ?? "")}
+                                preview={mode}
+                                height="100%"
+                                commands={commands}
+                                extraCommands={extraCommands}
+                            />
+                        </div>
                     </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+                </DialogPrimitive.Content>
+            </DialogPrimitive.Portal>
+        </DialogPrimitive.Root>
     )
 }

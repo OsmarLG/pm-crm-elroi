@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import MDEditor, { getCommands } from "@uiw/react-md-editor"
+import MDEditor, { getCommands, getExtraCommands } from "@uiw/react-md-editor"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -35,11 +35,7 @@ type Props = {
 
 type FolderOption = { id: number | null; label: string }
 
-function flattenFolders(
-  folders: Folder[],
-  depth = 0,
-  acc: FolderOption[] = []
-) {
+function flattenFolders(folders: Folder[], depth = 0, acc: FolderOption[] = []) {
   for (const f of folders) {
     const id = Number(f.id)
     const indent = "\u00A0".repeat(depth * 3)
@@ -90,31 +86,33 @@ export function NoteEditor({
 
   React.useEffect(() => {
     const html = document.documentElement
-
-    const syncTheme = () => {
-      setColorMode(html.classList.contains("dark") ? "dark" : "light")
-    }
-
+    const syncTheme = () => setColorMode(html.classList.contains("dark") ? "dark" : "light")
     syncTheme()
-
     const observer = new MutationObserver(syncTheme)
     observer.observe(html, { attributes: true, attributeFilter: ["class"] })
-
     return () => observer.disconnect()
   }, [])
 
   React.useEffect(() => {
     setTitle(note?.title ?? "")
     setContent(note?.content ?? "")
-    setSelectedFolderId(
-      note?.folder_id ? Number(note.folder_id) : (folderId ?? null)
-    )
+    setSelectedFolderId(note?.folder_id ? Number(note.folder_id) : (folderId ?? null))
   }, [note?.id, folderId])
 
   const options = React.useMemo(() => {
     const flat = flattenFolders(folders)
     return [{ id: null, label: "No folder" }, ...flat]
   }, [folders])
+
+  // ✅ elimina FULLSCREEN nativo de uiw tanto en toolbar como extra toolbar
+  const commands = React.useMemo(
+    () => getCommands().filter((cmd) => cmd.name !== "fullscreen"),
+    []
+  )
+  const extraCommands = React.useMemo(
+    () => getExtraCommands().filter((cmd) => cmd.name !== "fullscreen"),
+    []
+  )
 
   return (
     <div className="space-y-4 flex flex-col h-full md:block md:h-auto">
@@ -159,9 +157,7 @@ export function NoteEditor({
             disabled={refactoring || saving || !content}
             title="Refactor & Improve content"
           >
-            <Sparkles
-              className={`h-4 w-4 ${refactoring ? "animate-spin" : ""}`}
-            />
+            <Sparkles className={`h-4 w-4 ${refactoring ? "animate-spin" : ""}`} />
           </Button>
 
           <div className="w-px h-6 bg-border mx-1" />
@@ -177,9 +173,7 @@ export function NoteEditor({
             disabled={saving || title.trim().length === 0}
           >
             <Save className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">
-              {saving ? "Saving..." : "Save"}
-            </span>
+            <span className="hidden sm:inline">{saving ? "Saving..." : "Save"}</span>
           </Button>
         </div>
       </div>
@@ -189,9 +183,7 @@ export function NoteEditor({
         <Label>Folder</Label>
         <Select
           value={selectedFolderId === null ? "null" : String(selectedFolderId)}
-          onValueChange={(v) =>
-            setSelectedFolderId(v === "null" ? null : Number(v))
-          }
+          onValueChange={(v) => setSelectedFolderId(v === "null" ? null : Number(v))}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a folder" />
@@ -234,7 +226,8 @@ export function NoteEditor({
             onChange={(v) => setContent(v ?? "")}
             preview="edit"
             height="100%"
-            commands={[...getCommands().filter((cmd) => cmd.name !== "fullscreen")]}
+            commands={commands}
+            extraCommands={extraCommands}
           />
         </div>
 

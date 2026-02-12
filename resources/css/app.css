@@ -308,16 +308,7 @@
     margin-left: 0 !important;
 }
 
-/* Fix fullscreen background transparency */
-.w-md-editor-fullscreen {
-    z-index: 1000 !important;
-    background-color: hsl(var(--background)) !important;
-}
-
-[data-color-mode="dark"] .w-md-editor-fullscreen {
-    background-color: hsl(var(--background)) !important;
-}
-
+/* ✅ Asegura que el editor y sus paneles llenen el alto disponible */
 .w-md-editor,
 .w-md-editor-content,
 .w-md-editor-text,
