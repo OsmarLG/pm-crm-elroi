@@ -220,7 +220,7 @@ export function NoteEditor({
           <MDEditor
             value={content}
             onChange={(v) => setContent(v ?? "")}
-            preview="live"
+            preview="edit"
             height={600}
             commands={commands}
             extraCommands={extraCommands}

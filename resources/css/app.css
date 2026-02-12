@@ -313,37 +313,15 @@
     border-radius: calc(var(--radius) - 2px);
 }
 
-/* Forzar text wrapping en el editor */
-.w-md-editor-text textarea,
-.w-md-editor-text-pre {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-    white-space: pre-wrap !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-}
-
-/* Scroll independiente en ambos paneles */
+/* Scroll independiente en ambos paneles - SOLO esto */
 .w-md-editor-content {
-    display: flex !important;
-    overflow: hidden !important;
-    height: 100% !important;
+    display: flex;
+    overflow: hidden;
 }
 
 .w-md-editor-text,
 .w-md-editor-preview {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    flex: 1 !important;
-    max-width: 50% !important;
-}
-
-/* Asegurar que los elementos internos no causen overflow horizontal */
-.w-md-editor-text * {
-    max-width: 100% !important;
-}
-
-.w-md-editor-text-pre>code,
-.w-md-editor-text textarea {
-    white-space: pre-wrap !important;
-    word-break: break-word !important;
+    overflow-y: auto;
+    overflow-x: auto;
+    flex: 1;
 }

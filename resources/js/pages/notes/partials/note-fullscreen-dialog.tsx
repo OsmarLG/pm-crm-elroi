@@ -118,7 +118,7 @@ export function NoteFullscreenDialog({
                             <MDEditor
                                 value={localContent}
                                 onChange={(v) => setLocalContent(v ?? "")}
-                                preview="live"
+                                preview={mode}
                                 height="100%"
                                 commands={commands}
                                 extraCommands={extraCommands}
