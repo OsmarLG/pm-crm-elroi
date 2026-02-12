@@ -90,14 +90,17 @@ class NoteController extends Controller
         $note = $this->service->createNote($request->validated());
 
         return redirect()
-            ->route('notes.index', ['note' => $note->id, 'folder_id' => request('folder_id')])
+            ->route('notes.show', $note)
             ->with('success', 'Note created.');
     }
 
     public function update(NoteUpdateRequest $request, Note $note)
     {
         $this->service->updateNote($note, $request->validated());
-        return back()->with('success', 'Saved.');
+
+        return redirect()
+            ->route('notes.show', $note)
+            ->with('success', 'Saved.');
     }
 
     public function destroy(Note $note)

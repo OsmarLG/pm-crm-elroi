@@ -39,7 +39,23 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
   const { auth } = usePage().props as any
   const n = note?.data
 
+  /** 🔥 Detecta light / dark desde <html class="dark"> */
   const [colorMode, setColorMode] = React.useState<"light" | "dark">("light")
+
+  React.useEffect(() => {
+    const html = document.documentElement
+
+    const syncTheme = () => {
+      setColorMode(html.classList.contains("dark") ? "dark" : "light")
+    }
+
+    syncTheme()
+
+    const observer = new MutationObserver(syncTheme)
+    observer.observe(html, { attributes: true, attributeFilter: ["class"] })
+
+    return () => observer.disconnect()
+  }, [])
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: "Notes", href: "/notes" },
@@ -157,9 +173,9 @@ export default function NoteShowPage({ note, canEdit }: PageProps) {
         </div>
 
         {/* Body */}
-        <div className="rounded-md border overflow-hidden">
-          <div data-color-mode={colorMode} className="p-4">
-            <MDEditor.Markdown source={n?.content || ""} />
+        <div className="rounded-md border overflow-hidden bg-background">
+          <div data-color-mode={colorMode} className="p-4 bg-background text-foreground">
+            <MDEditor.Markdown source={n?.content || ""} style={{ backgroundColor: 'transparent', color: 'inherit' }} />
           </div>
         </div>
       </div>
