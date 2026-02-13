@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog"
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
-import { Separator } from "@/components/ui/separator"
 import { useAppearance } from "@/hooks/use-appearance"
 
 import { Task } from "./index"
@@ -120,9 +119,9 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                 </Badge>
                             </DialogTitle>
                         </DialogHeader>
-                        <ScrollArea className="flex-1 pr-4">
-                            <div className="space-y-4 py-4">
-                                <div>
+                        <div className="flex-1 overflow-y-auto min-h-0 pr-4">
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
                                     <h4 className="text-sm font-medium mb-2 text-muted-foreground">Description</h4>
                                     <div className="prose dark:prose-invert max-w-none text-sm p-3 border rounded-md bg-muted/30" data-color-mode={isDark ? 'dark' : 'light'}>
                                         <MDEditor.Markdown source={task.description || "No description provided."} style={{ backgroundColor: 'transparent' }} />
@@ -162,7 +161,7 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                     )}
                                 </div>
                             </div>
-                        </ScrollArea>
+                        </div>
                     </DialogContent>
                 </Dialog>
 
