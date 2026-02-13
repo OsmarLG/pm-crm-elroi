@@ -19,7 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, FolderOpen } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 
@@ -129,9 +129,10 @@ export default function ProjectIndex({ projects }: Props) {
                                             <TableCell className="whitespace-nowrap">{project.due_date ? new Date(project.due_date).toLocaleDateString() : "-"}</TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
-                                                    <Button variant="ghost" size="icon" asChild>
+                                                    <Button variant="ghost" size="sm" asChild>
                                                         <Link href={route("admin.projects.edit", project.id)}>
-                                                            <Pencil className="h-4 w-4" />
+                                                            <FolderOpen className="h-4 w-4 mr-2" />
+                                                            Open
                                                         </Link>
                                                     </Button>
                                                     <Button

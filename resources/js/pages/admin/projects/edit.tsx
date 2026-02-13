@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft, Edit2, Lock } from "lucide-react"
 import { toast } from "sonner"
 // Use correct casing matching filesystem
 import ProjectMembersManager from "@/components/Admin/ProjectMembersManager"
@@ -70,7 +70,10 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         put(route("admin.projects.update", project.id), {
-            onSuccess: () => toast.success("Project updated successfully"),
+            onSuccess: () => {
+                toast.success("Project updated successfully")
+                setIsEditingMode(false)
+            },
             onError: () => toast.error("Failed to update project"),
         })
     }
@@ -103,7 +106,10 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
         return () => observer.disconnect()
     }, [])
 
-    const canEdit = user_role === 'owner' || user_role === 'admin';
+    const [isEditingMode, setIsEditingMode] = useState(false)
+
+    const canEditPermission = user_role === 'owner' || user_role === 'admin';
+    const isFieldDisabled = !canEditPermission || !isEditingMode;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -118,14 +124,34 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                             </Link>
                         </Button>
                         <h2 className="text-xl font-bold tracking-tight">
-                            {canEdit ? "Edit Project" : "Project Details"}
+                            {canEditPermission ? "Edit Project" : "Project Details"}
                         </h2>
                     </div>
-                    <Button asChild variant="outline">
-                        <Link href={route("admin.tasks.index", { project_id: project.id })}>
-                            Manage Tasks
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        {canEditPermission && (
+                            <Button
+                                variant={isEditingMode ? "destructive" : "default"}
+                                onClick={() => setIsEditingMode(!isEditingMode)}
+                            >
+                                {isEditingMode ? (
+                                    <>
+                                        <Lock className="mr-2 h-4 w-4" />
+                                        Bloquear Edición
+                                    </>
+                                ) : (
+                                    <>
+                                        <Edit2 className="mr-2 h-4 w-4" />
+                                        Habilitar Edición
+                                    </>
+                                )}
+                            </Button>
+                        )}
+                        <Button asChild variant="outline">
+                            <Link href={route("admin.tasks.index", { project_id: project.id })}>
+                                Manage Tasks
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -145,7 +171,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                                 onChange={(e) => setData("name", e.target.value)}
                                                 placeholder="New Website Redesign"
                                                 required
-                                                disabled={!canEdit}
+                                                disabled={isFieldDisabled}
                                             />
                                             {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                                         </div>
@@ -155,7 +181,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                             <Select
                                                 value={data.customer_id}
                                                 onValueChange={(value) => setData("customer_id", value)}
-                                                disabled={!canEdit}
+                                                disabled={isFieldDisabled}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a customer" />
@@ -176,7 +202,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                             <Select
                                                 value={data.status}
                                                 onValueChange={(value) => setData("status", value)}
-                                                disabled={!canEdit}
+                                                disabled={isFieldDisabled}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select status" />
@@ -197,11 +223,11 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                             <div data-color-mode={theme}>
                                                 <MDEditor
                                                     value={data.description}
-                                                    onChange={(val) => canEdit && setData("description", val || "")}
+                                                    onChange={(val) => isEditingMode && canEditPermission && setData("description", val || "")}
                                                     height={200}
-                                                    preview="preview"
-                                                    visibleDragbar={canEdit}
-                                                    hideToolbar={!canEdit}
+                                                    preview={isEditingMode ? "edit" : "preview"}
+                                                    visibleDragbar={isEditingMode && canEditPermission}
+                                                    hideToolbar={!isEditingMode || !canEditPermission}
                                                 />
                                             </div>
                                             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
@@ -213,9 +239,11 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                                 <div data-color-mode={theme}>
                                                     <MDEditor
                                                         value={data.confidential_info}
-                                                        onChange={(val) => setData("confidential_info", val || "")}
+                                                        onChange={(val) => isEditingMode && setData("confidential_info", val || "")}
                                                         height={200}
-                                                        preview="edit"
+                                                        preview={isEditingMode ? "edit" : "preview"}
+                                                        visibleDragbar={isEditingMode}
+                                                        hideToolbar={!isEditingMode}
                                                     />
                                                 </div>
                                                 {errors.confidential_info && <p className="text-sm text-destructive">{errors.confidential_info}</p>}
@@ -229,7 +257,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                                 type="date"
                                                 value={data.start_date}
                                                 onChange={(e) => setData("start_date", e.target.value)}
-                                                disabled={!canEdit}
+                                                disabled={isFieldDisabled}
                                             />
                                             {errors.start_date && <p className="text-sm text-destructive">{errors.start_date}</p>}
                                         </div>
@@ -240,16 +268,16 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                                 type="date"
                                                 value={data.due_date}
                                                 onChange={(e) => setData("due_date", e.target.value)}
-                                                disabled={!canEdit}
+                                                disabled={isFieldDisabled}
                                             />
                                             {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
                                         </div>
                                     </div>
 
-                                    {canEdit && (
+                                    {isEditingMode && canEditPermission && (
                                         <div className="flex justify-end gap-4 pt-4 border-t">
-                                            <Button variant="outline" asChild>
-                                                <Link href={route("admin.projects.index")}>Cancel</Link>
+                                            <Button variant="outline" type="button" onClick={() => setIsEditingMode(false)}>
+                                                Cancel
                                             </Button>
                                             <Button type="submit" disabled={processing}>
                                                 {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

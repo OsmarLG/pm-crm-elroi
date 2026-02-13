@@ -622,8 +622,8 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                                                 {errors.result_explanation && <p className="text-sm text-destructive">{errors.result_explanation}</p>}
                                             </div>
 
-                                            <div className="grid grid-cols-3 gap-4">
-                                                <div className="space-y-2">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2 md:col-span-2">
                                                     <Label htmlFor="assigned_to">Assignee</Label>
                                                     <Select
                                                         value={data.assigned_to}
@@ -769,8 +769,8 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                                         {errorsEdit.result_explanation && <p className="text-sm text-destructive">{errorsEdit.result_explanation}</p>}
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="space-y-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="edit-assigned_to">Assignee</Label>
                                             <Select
                                                 value={editData.assigned_to}

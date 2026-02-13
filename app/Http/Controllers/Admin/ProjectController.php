@@ -84,7 +84,7 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        return redirect()->route('admin.projects.index')->with('success', 'Project updated successfully.');
+        return back()->with('success', 'Project updated successfully.');
     }
 
     public function destroy(\App\Models\Project $project)
