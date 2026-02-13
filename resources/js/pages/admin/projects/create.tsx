@@ -29,6 +29,7 @@ export default function ProjectCreate({ customers }: Props) {
         name: "",
         customer_id: "",
         description: "",
+        confidential_info: "",
         status: "pending",
         start_date: "",
         due_date: "",
@@ -153,6 +154,19 @@ export default function ProjectCreate({ customers }: Props) {
                                         />
                                     </div>
                                     {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label htmlFor="confidential_info">Confidential Information (Markdown) - Owner Only</Label>
+                                    <div data-color-mode={theme}>
+                                        <MDEditor
+                                            value={data.confidential_info}
+                                            onChange={(val) => setData("confidential_info", val || "")}
+                                            height={200}
+                                            preview="edit"
+                                        />
+                                    </div>
+                                    {errors.confidential_info && <p className="text-sm text-destructive">{errors.confidential_info}</p>}
                                 </div>
 
                                 <div className="space-y-2">

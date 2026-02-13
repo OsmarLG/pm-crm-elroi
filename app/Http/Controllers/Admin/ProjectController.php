@@ -25,6 +25,7 @@ class ProjectController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'confidential_info' => 'nullable|string',
             'status' => 'required|in:pending,in_progress,completed,on_hold,cancelled',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
@@ -56,8 +57,14 @@ class ProjectController extends Controller
             $userRole = $member->pivot->role;
         }
 
+        // Only pass confidential_info to owners
+        $projectData = $project->toArray();
+        if ($userRole !== 'owner') {
+            unset($projectData['confidential_info']);
+        }
+
         return inertia('admin/projects/edit', [
-            'project' => $project,
+            'project' => $projectData,
             'customers' => $customers,
             'user_role' => $userRole
         ]);
@@ -69,6 +76,7 @@ class ProjectController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'confidential_info' => 'nullable|string',
             'status' => 'required|in:pending,in_progress,completed,on_hold,cancelled',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',

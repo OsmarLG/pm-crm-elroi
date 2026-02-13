@@ -27,6 +27,7 @@ type Project = {
     id: number
     name: string
     description: string | null
+    confidential_info?: string | null
     status: string
     customer_id: number
     customer?: Customer
@@ -60,6 +61,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
         name: project.name || "",
         customer_id: project.customer_id.toString(),
         description: project.description || "",
+        confidential_info: project.confidential_info || "",
         status: project.status || "pending",
         start_date: project.start_date ? project.start_date.split('T')[0] : "",
         due_date: project.due_date ? project.due_date.split('T')[0] : "",
@@ -204,6 +206,21 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                             </div>
                                             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                         </div>
+
+                                        {user_role === 'owner' && (
+                                            <div className="space-y-2 md:col-span-2">
+                                                <Label htmlFor="confidential_info">Confidential Information (Markdown) - Owner Only</Label>
+                                                <div data-color-mode={theme}>
+                                                    <MDEditor
+                                                        value={data.confidential_info}
+                                                        onChange={(val) => setData("confidential_info", val || "")}
+                                                        height={200}
+                                                        preview="edit"
+                                                    />
+                                                </div>
+                                                {errors.confidential_info && <p className="text-sm text-destructive">{errors.confidential_info}</p>}
+                                            </div>
+                                        )}
 
                                         <div className="space-y-2">
                                             <Label htmlFor="start_date">Start Date</Label>

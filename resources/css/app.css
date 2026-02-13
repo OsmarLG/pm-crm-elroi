@@ -291,6 +291,12 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Fix for Radix UI Dialog removing overflow from body */
+    html, body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
 }
 
 /* Fix listas para @uiw/react-md-editor */

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
-    protected $fillable = ['customer_id', 'name', 'description', 'status', 'start_date', 'due_date'];
+    protected $fillable = ['customer_id', 'name', 'description', 'confidential_info', 'status', 'start_date', 'due_date'];
 
     protected static function booted()
     {
