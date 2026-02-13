@@ -410,7 +410,6 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             onChange={(val) => setData("description", val || "")}
                                             height={200}
                                             preview="edit"
-                                            style={{ backgroundColor: 'transparent' }}
                                         />
                                         {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                     </div>
@@ -421,7 +420,6 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             onChange={(val) => setData("result_explanation", val || "")}
                                             height={150}
                                             preview="edit"
-                                            style={{ backgroundColor: 'transparent' }}
                                         />
                                         {errors.result_explanation && <p className="text-sm text-destructive">{errors.result_explanation}</p>}
                                     </div>
@@ -482,7 +480,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                     </Dialog>
 
                     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0">
+                        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 bg-background">
                             <DialogHeader className="p-6 pb-2">
                                 <DialogTitle>Edit Task</DialogTitle>
                             </DialogHeader>
@@ -542,7 +540,6 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             onChange={(val) => setEditData("description", val || "")}
                                             height={200}
                                             preview="edit"
-                                            style={{ backgroundColor: 'transparent' }}
                                         />
                                         {errorsEdit.description && <p className="text-sm text-destructive">{errorsEdit.description}</p>}
                                     </div>
@@ -553,7 +550,6 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             onChange={(val) => setEditData("result_explanation", val || "")}
                                             height={150}
                                             preview="edit"
-                                            style={{ backgroundColor: 'transparent' }}
                                         />
                                         {errorsEdit.result_explanation && <p className="text-sm text-destructive">{errorsEdit.result_explanation}</p>}
                                     </div>

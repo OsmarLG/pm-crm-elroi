@@ -121,7 +121,7 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                         </DialogHeader>
                         <div className="flex-1 overflow-y-auto min-h-0 pr-4">
                             <div className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div>
                                     <h4 className="text-sm font-medium mb-2 text-muted-foreground">Description</h4>
                                     <div className="prose dark:prose-invert max-w-none text-sm p-3 border rounded-md bg-muted/30" data-color-mode={isDark ? 'dark' : 'light'}>
                                         <MDEditor.Markdown source={task.description || "No description provided."} style={{ backgroundColor: 'transparent' }} />
