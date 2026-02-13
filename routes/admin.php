@@ -95,5 +95,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('settings/ai')->name('settings.ai.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AiSettingsController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\Admin\AiSettingsController::class, 'update'])->name('update');
+
+        // Model Management
+        Route::post('/models', [\App\Http\Controllers\Admin\AiSettingsController::class, 'storeModel'])->name('models.store');
+        Route::put('/models/{id}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'updateModel'])->name('models.update');
+        Route::delete('/models/{id}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'destroyModel'])->name('models.destroy');
     });
 });

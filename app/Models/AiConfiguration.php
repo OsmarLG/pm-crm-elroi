@@ -18,4 +18,9 @@ class AiConfiguration extends Model
         'is_active' => 'boolean',
         'meta' => 'array',
     ];
+
+    public function models(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AiModel::class);
+    }
 }
