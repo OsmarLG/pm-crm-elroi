@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ProjectController extends Controller
+{
+    public function index()
+    {
+        $projects = \App\Models\Project::with('customer')->latest()->paginate(10);
+        return inertia('admin/projects/index', ['projects' => $projects]);
+    }
+
+    public function create()
+    {
+        $customers = \App\Models\Customer::all();
+        return inertia('admin/projects/create', ['customers' => $customers]);
+    }
+
+    public function store(\Illuminate\Http\Request $request)
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:pending,in_progress,completed,on_hold,cancelled',
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date',
+        ]);
+
+        \App\Models\Project::create($validated);
+
+        return redirect()->route('admin.projects.index')->with('success', 'Project created successfully.');
+    }
+
+    public function edit(\App\Models\Project $project)
+    {
+        $customers = \App\Models\Customer::all();
+        return inertia('admin/projects/edit', ['project' => $project, 'customers' => $customers]);
+    }
+
+    public function update(\Illuminate\Http\Request $request, \App\Models\Project $project)
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:pending,in_progress,completed,on_hold,cancelled',
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $project->update($validated);
+
+        return redirect()->route('admin.projects.index')->with('success', 'Project updated successfully.');
+    }
+
+    public function destroy(\App\Models\Project $project)
+    {
+        $project->delete();
+        return redirect()->route('admin.projects.index')->with('success', 'Project deleted successfully.');
+    }
+}

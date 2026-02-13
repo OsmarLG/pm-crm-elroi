@@ -50,6 +50,23 @@ const mainNavItems: NavItem[] = [
 
 const adminNavItems: NavItem[] = [
     {
+        title: "CRM",
+        icon: Users,
+        href: "/admin/customers",
+        children: [
+            {
+                title: "Customers",
+                href: "/admin/customers",
+                icon: Users,
+            },
+            {
+                title: "Projects",
+                href: "/admin/projects",
+                icon: Folder,
+            },
+        ],
+    },
+    {
         title: "User Management",
         icon: UserCog,
         href: "/admin/users",

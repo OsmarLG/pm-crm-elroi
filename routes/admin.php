@@ -97,8 +97,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/', [\App\Http\Controllers\Admin\AiSettingsController::class, 'update'])->name('update');
 
         // Model Management
-        Route::post('/models', [\App\Http\Controllers\Admin\AiSettingsController::class, 'storeModel'])->name('models.store');
-        Route::put('/models/{id}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'updateModel'])->name('models.update');
-        Route::delete('/models/{id}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'destroyModel'])->name('models.destroy');
+        Route::post('settings/ai/models', [\App\Http\Controllers\Admin\AiSettingsController::class, 'storeModel'])->name('settings.ai.models.store');
+        Route::put('settings/ai/models/{model}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'updateModel'])->name('settings.ai.models.update');
+        Route::delete('settings/ai/models/{model}', [\App\Http\Controllers\Admin\AiSettingsController::class, 'destroyModel'])->name('settings.ai.models.destroy');
+
     });
+
+    // CRM Routes
+    Route::resource('customers', \App\Http\Controllers\Admin\CustomerController::class);
+    Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+    Route::resource('tasks', \App\Http\Controllers\Admin\TaskController::class);
+    Route::put('tasks/{task}/status', [\App\Http\Controllers\Admin\TaskController::class, 'updateStatus'])->name('tasks.update-status');
 });
