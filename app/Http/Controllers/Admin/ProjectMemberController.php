@@ -40,6 +40,20 @@ class ProjectMemberController extends Controller
             'role' => 'required|in:admin,member,owner',
         ]);
 
+        // Ensure we have the user with pivot data for this specific project
+        $projectMember = $project->users()->where('user_id', $member->id)->first();
+
+        if (!$projectMember) {
+            return back()->withErrors(['error' => 'User is not a member of this project.']);
+        }
+
+        // Prevent demoting the last owner
+        if ($projectMember->pivot->role === 'owner' && $validated['role'] !== 'owner') {
+            if ($project->users()->wherePivot('role', 'owner')->count() <= 1) {
+                return back()->withErrors(['error' => 'Cannot change the role of the last owner. Assign another owner first.']);
+            }
+        }
+
         $project->users()->updateExistingPivot($member->id, ['role' => $validated['role']]);
 
         return back()->with('success', 'Member role updated successfully.');
@@ -47,8 +61,15 @@ class ProjectMemberController extends Controller
 
     public function destroy(Project $project, User $member)
     {
+        // Ensure we have the user with pivot data
+        $projectMember = $project->users()->where('user_id', $member->id)->first();
+
+        if (!$projectMember) {
+            return back()->withErrors(['error' => 'User is not a member of this project.']);
+        }
+
         // Prevent removing the last owner
-        if ($member->pivot->role === 'owner' && $project->users()->wherePivot('role', 'owner')->count() <= 1) {
+        if ($projectMember->pivot->role === 'owner' && $project->users()->wherePivot('role', 'owner')->count() <= 1) {
             return back()->withErrors(['error' => 'Cannot remove the last owner of the project.']);
         }
 

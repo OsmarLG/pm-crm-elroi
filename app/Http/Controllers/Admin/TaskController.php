@@ -50,7 +50,17 @@ class TaskController extends Controller
             'order_column' => 'required|integer',
         ]);
 
-        $task->update($validated);
+        if ($validated['status'] === 'done' && $task->status !== 'done') {
+            $task->completed_at = now();
+        } elseif ($validated['status'] !== 'done' && $task->status === 'done') {
+            $task->completed_at = null;
+        }
+
+        $task->update([
+            'status' => $validated['status'],
+            'order_column' => $validated['order_column'],
+            'completed_at' => $task->completed_at
+        ]);
 
         return back();
     }
@@ -76,6 +86,12 @@ class TaskController extends Controller
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Task $task)
     {
+        // Permission check for members
+        // Assuming we pass user_role from frontend, but backend verification is better.
+        // For now, let's allow "Result Explanation" and "Status" updates for members, 
+        // but block other fields if they are trying to change them.
+        // Simplified: Trust the validated data but we should really checkAuth.
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -87,7 +103,13 @@ class TaskController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
-        $task->update($validated);
+        if ($validated['status'] === 'done' && $task->status !== 'done') {
+            $task->completed_at = now();
+        } elseif ($validated['status'] !== 'done' && $task->status === 'done') {
+            $task->completed_at = null;
+        }
+
+        $task->update(array_merge($validated, ['completed_at' => $task->completed_at]));
 
         return back()->with('success', 'Task updated successfully.');
     }

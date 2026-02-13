@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Head, useForm, router } from "@inertiajs/react"
+import { Head, useForm, router, usePage } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
 import { Plus, ArrowLeft, Users, Shield, Trash2, UserPlus } from "lucide-react"
@@ -62,6 +62,7 @@ export type Task = {
     } | null
     start_date: string | null
     due_date: string | null
+    completed_at: string | null
 }
 
 type Project = {
@@ -571,6 +572,7 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                             <Select
                                                 value={editData.status}
                                                 onValueChange={(value) => setEditData("status", value)}
+                                                disabled={user_role === 'member'}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select status" />
@@ -588,6 +590,7 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                             <Select
                                                 value={editData.priority}
                                                 onValueChange={(value) => setEditData("priority", value)}
+                                                disabled={user_role === 'member'}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select priority" />
@@ -608,6 +611,8 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                             onChange={(val) => setEditData("description", val || "")}
                                             height={200}
                                             preview={user_role === 'member' ? "preview" : "edit"}
+                                            hideToolbar={user_role === 'member'}
+                                            visibleDragbar={user_role !== 'member'}
                                         />
                                         {errorsEdit.description && <p className="text-sm text-destructive">{errorsEdit.description}</p>}
                                     </div>
@@ -617,7 +622,15 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                             value={editData.result_explanation}
                                             onChange={(val) => setEditData("result_explanation", val || "")}
                                             height={150}
-                                            preview="edit"
+                                            // Member can edit ONLY IF assigned to them.
+                                            // If user_role is member AND (task is NOT assigned OR assigned to someone else) -> preview only
+                                            preview={
+                                                user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id
+                                                    ? "preview"
+                                                    : "edit"
+                                            }
+                                            hideToolbar={user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id}
+                                            visibleDragbar={!(user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id)}
                                         />
                                         {errorsEdit.result_explanation && <p className="text-sm text-destructive">{errorsEdit.result_explanation}</p>}
                                     </div>
@@ -666,14 +679,42 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                             {errorsEdit.due_date && <p className="text-sm text-destructive">{errorsEdit.due_date}</p>}
                                         </div>
                                     </div>
-                                    <div className="flex justify-end gap-2 pt-4">
-                                        <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
-                                            Cancel
-                                        </Button>
-                                        <Button type="submit" disabled={processingEdit}>
-                                            {processingEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                            Save Changes
-                                        </Button>
+                                    <div className="flex justify-between items-center pt-4">
+                                        <div>
+                                            {(user_role !== 'member' ||
+                                                (user_role === 'member' && editingTask?.assignee?.id === usePage<any>().props.auth.user.id)) &&
+                                                editData.status !== 'done' && (
+                                                    <Button type="button" variant="outline" className="border-green-500 text-green-500 hover:bg-green-50" onClick={() => {
+                                                        if (!editingTask) return
+                                                        router.put(route("admin.tasks.update", editingTask.id), {
+                                                            ...editData,
+                                                            status: 'done'
+                                                        }, {
+                                                            onSuccess: () => {
+                                                                setIsEditOpen(false)
+                                                                resetEdit()
+                                                                setEditingTask(null)
+                                                                toast.success("Task marked as completed")
+                                                            },
+                                                            onError: () => toast.error("Failed to update task"),
+                                                        })
+                                                    }}>
+                                                        Mark as Completed
+                                                    </Button>
+                                                )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                                                Cancel
+                                            </Button>
+                                            {/* Only show Save if allowed to edit something */}
+                                            {(user_role !== 'member' || editingTask?.assignee?.id === usePage<any>().props.auth.user.id) && (
+                                                <Button type="submit" disabled={processingEdit}>
+                                                    {processingEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                    Save Changes
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -723,13 +764,14 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                 id={col}
                                 title={col.replace("_", " ").toUpperCase()}
                                 tasks={items[col] || []}
+                                user_role={user_role}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
                             />
                         ))}
                     </div>
                     <DragOverlay>
-                        {activeId ? <TaskCard task={Object.values(items).flat().find((t) => t.id === activeId)!} onEdit={() => { }} onDelete={() => { }} /> : null}
+                        {activeId ? <TaskCard task={Object.values(items).flat().find((t) => t.id === activeId)!} user_role={user_role} onEdit={() => { }} onDelete={() => { }} /> : null}
                     </DragOverlay>
                 </DndContext>
             </div>

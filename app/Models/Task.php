@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
-    protected $fillable = ['project_id', 'title', 'description', 'status', 'priority', 'result_explanation', 'order_column', 'start_date', 'due_date', 'assigned_to'];
+    protected $fillable = ['project_id', 'title', 'description', 'status', 'priority', 'result_explanation', 'order_column', 'start_date', 'due_date', 'assigned_to', 'completed_at'];
 
     protected $casts = [
         'start_date' => 'date',
         'due_date' => 'date',
+        'completed_at' => 'datetime',
     ];
 
     public function project()

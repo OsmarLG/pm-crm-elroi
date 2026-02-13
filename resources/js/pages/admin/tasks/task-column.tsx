@@ -8,11 +8,12 @@ type Props = {
     id: string
     title: string
     tasks: Task[]
+    user_role: string
     onEdit: (task: Task) => void
     onDelete: (taskId: number) => void
 }
 
-export function TaskColumn({ id, title, tasks, onEdit, onDelete }: Props) {
+export function TaskColumn({ id, title, tasks, user_role, onEdit, onDelete }: Props) {
     const { setNodeRef } = useDroppable({
         id: id,
     })
@@ -38,6 +39,7 @@ export function TaskColumn({ id, title, tasks, onEdit, onDelete }: Props) {
                         <TaskCard
                             key={task.id}
                             task={task}
+                            user_role={user_role}
                             onEdit={onEdit}
                             onDelete={onDelete}
                         />

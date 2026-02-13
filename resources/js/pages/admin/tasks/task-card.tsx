@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, User, MoreHorizontal, Pencil, Trash, Eye, AlignLeft } from "lucide-react"
+import { Calendar, User, MoreHorizontal, Pencil, Trash, Eye, AlignLeft, CheckCircle, AlertCircle, Clock } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,18 +26,22 @@ import { Task } from "./index"
 
 type Props = {
     task: Task
+    user_role: string
     onEdit: (task: Task) => void
     onDelete: (taskId: number) => void
 }
 
-export function TaskCard({ task, onEdit, onDelete }: Props) {
+export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
     const {
         attributes,
         listeners,
         setNodeRef,
         transform,
         transition,
-    } = useSortable({ id: task.id })
+    } = useSortable({
+        id: task.id,
+        disabled: user_role === 'member'
+    })
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -62,9 +66,12 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
         }
     }
 
+    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
+    const isCompletedLate = task.completed_at && task.due_date && new Date(task.completed_at) > new Date(task.due_date);
+
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
-            <Card className="cursor-move hover:shadow-md transition-shadow bg-card text-card-foreground group relative border-border">
+            <Card className={`cursor-move hover:shadow-md transition-shadow bg-card text-card-foreground group relative border-border ${user_role === 'member' ? 'cursor-default' : ''}`}>
                 <div
                     className="absolute top-2 right-2 z-10"
                     onPointerDown={(e) => e.stopPropagation()}
@@ -97,18 +104,20 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive" onClick={(e) => {
-                                e.stopPropagation()
-                                onDelete(task.id)
-                            }}>
-                                <Trash className="mr-2 h-4 w-4" />
-                                Delete
-                            </DropdownMenuItem>
+                            {user_role !== 'member' && (
+                                <DropdownMenuItem className="text-destructive" onClick={(e) => {
+                                    e.stopPropagation()
+                                    onDelete(task.id)
+                                }}>
+                                    <Trash className="mr-2 h-4 w-4" />
+                                    Delete
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
 
-                {/* View Details Modal - completely separate from card content to avoid nesting issues */}
+                {/* View Details Modal */}
                 <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
                     <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
                         <DialogHeader>
@@ -117,6 +126,12 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                 <Badge variant="outline" className={`ml-2 capitalize ${getPriorityColor(task.priority)}`}>
                                     {task.priority || 'medium'}
                                 </Badge>
+                                {task.status === 'done' && (
+                                    <Badge variant="outline" className="ml-2 border-green-500 text-green-500 gap-1">
+                                        <CheckCircle className="h-3 w-3" />
+                                        Completed
+                                    </Badge>
+                                )}
                             </DialogTitle>
                         </DialogHeader>
                         <div className="flex-1 overflow-y-auto min-h-0 pr-4">
@@ -159,6 +174,12 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                             <span>Due: <span className="text-foreground font-medium">{new Date(task.due_date).toLocaleDateString()}</span></span>
                                         </div>
                                     )}
+                                    {task.completed_at && (
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle className="h-4 w-4 text-green-500" />
+                                            <span>Completed: <span className="text-foreground font-medium">{new Date(task.completed_at).toLocaleDateString()} {new Date(task.completed_at).toLocaleTimeString()}</span></span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -172,10 +193,22 @@ export function TaskCard({ task, onEdit, onDelete }: Props) {
                                 {task.title}
                             </CardTitle>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                             <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 capitalize ${getPriorityColor(task.priority)}`}>
                                 {task.priority || 'medium'}
                             </Badge>
+                            {isOverdue && (
+                                <Badge variant="destructive" className="text-[10px] px-1 py-0 h-4 gap-1">
+                                    <AlertCircle className="h-3 w-3" />
+                                    Overdue
+                                </Badge>
+                            )}
+                            {task.status === 'done' && isCompletedLate && (
+                                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 gap-1 border-orange-500 text-orange-500">
+                                    <Clock className="h-3 w-3" />
+                                    Late
+                                </Badge>
+                            )}
                         </div>
                     </div>
                 </CardHeader>

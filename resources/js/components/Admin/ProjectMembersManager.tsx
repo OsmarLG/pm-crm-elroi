@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { router } from "@inertiajs/react"
+import { router, usePage } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,6 +40,9 @@ type Props = {
 }
 
 export default function ProjectMembersManager({ project, user_role }: Props) {
+    const { auth } = usePage<any>().props
+    const currentUser = auth.user
+
     const [inviteType, setInviteType] = useState<"email" | "username">("email")
     const [inviteValue, setInviteValue] = useState("")
     const [inviteRole, setInviteRole] = useState("member")
@@ -89,6 +92,14 @@ export default function ProjectMembersManager({ project, user_role }: Props) {
     }
 
     const handleUpdateRole = (memberId: number, newRole: string) => {
+        const isSelf = memberId === currentUser.id;
+
+        if (isSelf) {
+            if (!confirm("⚠️ CAUTION: You are changing your own role.\n\nIf you demote yourself from Owner/Admin, you may lose access to manage this project.\n\nAre you sure you want to proceed?")) {
+                return;
+            }
+        }
+
         router.put(route('admin.projects.members.update', { project: project.id, member: memberId }), {
             role: newRole
         }, {
@@ -201,7 +212,13 @@ export default function ProjectMembersManager({ project, user_role }: Props) {
                                 <Select
                                     value={member.pivot.role}
                                     onValueChange={(val) => handleUpdateRole(member.id, val)}
-                                    disabled={!canManage || member.pivot.role === 'owner'}
+                                    disabled={
+                                        // If not authorized to manage at all
+                                        !canManage ||
+                                        // If admin tries to edit owner
+                                        (user_role === 'admin' && member.pivot.role === 'owner')
+                                        // Owners can edit everyone, including other owners (with caution)
+                                    }
                                 >
                                     <SelectTrigger className="h-7 text-xs w-[90px]">
                                         <SelectValue />

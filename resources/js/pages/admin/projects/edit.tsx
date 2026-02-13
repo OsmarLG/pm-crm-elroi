@@ -197,8 +197,9 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                                     value={data.description}
                                                     onChange={(val) => canEdit && setData("description", val || "")}
                                                     height={200}
-                                                    preview={canEdit ? "edit" : "preview"}
+                                                    preview="preview"
                                                     visibleDragbar={canEdit}
+                                                    hideToolbar={!canEdit}
                                                 />
                                             </div>
                                             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
