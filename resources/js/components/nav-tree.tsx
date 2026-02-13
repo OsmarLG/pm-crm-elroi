@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Link, usePage } from "@inertiajs/react"
 import { ChevronRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 import {
   SidebarMenu,
@@ -80,9 +81,14 @@ export function NavTree({ items, level = 0, variant = "root" }: NavTreeProps) {
                   isActive={activeSelf}
                   tooltip={{ children: item.title }}
                 >
-                  <Link href={item.href!} prefetch>
+                  <Link href={item.href!} prefetch className="flex items-center w-full">
                     {item.icon && <item.icon />}
                     <span className="truncate">{item.title}</span>
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <Badge variant="secondary" className="ml-auto h-5 px-1.5 min-w-5 justify-center">
+                        {item.badge}
+                      </Badge>
+                    )}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -93,9 +99,14 @@ export function NavTree({ items, level = 0, variant = "root" }: NavTreeProps) {
           return (
             <SidebarMenuSubItem key={`${level}-${item.title}`}>
               <SidebarMenuSubButton asChild isActive={activeSelf}>
-                <Link href={item.href!} prefetch>
+                <Link href={item.href!} prefetch className="flex items-center w-full">
                   {item.icon && <item.icon />}
                   <span className="truncate">{item.title}</span>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <Badge variant="secondary" className="ml-auto h-5 px-1.5 min-w-5 justify-center">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
@@ -117,7 +128,7 @@ export function NavTree({ items, level = 0, variant = "root" }: NavTreeProps) {
                   <SidebarMenuButton
                     tooltip={{ children: item.title }}
                     isActive={activeTree}
-                    // en collapsed no hay espacio para chevron; el click abre dropdown
+                  // en collapsed no hay espacio para chevron; el click abre dropdown
                   >
                     {item.icon && <item.icon />}
                     <span className="truncate">{item.title}</span>
@@ -128,8 +139,13 @@ export function NavTree({ items, level = 0, variant = "root" }: NavTreeProps) {
                   {item.href && (
                     <>
                       <DropdownMenuItem asChild>
-                        <Link href={item.href} prefetch className="w-full">
-                          {item.title}
+                        <Link href={item.href} prefetch className="w-full flex items-center justify-between">
+                          <span className={activeSelf ? "font-semibold" : ""}>{item.title}</span>
+                          {item.badge !== undefined && item.badge > 0 && (
+                            <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                              {item.badge}
+                            </Badge>
+                          )}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -157,9 +173,14 @@ export function NavTree({ items, level = 0, variant = "root" }: NavTreeProps) {
                     tooltip={{ children: item.title }}
                     className="flex-1"
                   >
-                    <Link href={item.href} prefetch>
+                    <Link href={item.href} prefetch className="flex items-center w-full">
                       {item.icon && <item.icon />}
                       <span className="truncate">{item.title}</span>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <Badge variant="secondary" className="ml-auto h-5 px-1.5 min-w-5 justify-center">
+                          {item.badge}
+                        </Badge>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 ) : (
@@ -221,8 +242,13 @@ function DropdownNavItems({
         if (!hasChildren) {
           return (
             <DropdownMenuItem key={key} asChild>
-              <Link href={item.href!} prefetch className="w-full">
+              <Link href={item.href!} prefetch className="w-full flex items-center justify-between">
                 <span className={activeSelf ? "font-semibold" : ""}>{item.title}</span>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                    {item.badge}
+                  </Badge>
+                )}
               </Link>
             </DropdownMenuItem>
           )
@@ -241,6 +267,11 @@ function DropdownNavItems({
                 <DropdownMenuItem asChild>
                   <Link href={item.href} prefetch className="w-full">
                     {item.title}
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                        {item.badge}
+                      </Badge>
+                    )}
                   </Link>
                 </DropdownMenuItem>
               )}

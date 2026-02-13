@@ -107,5 +107,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('customers', \App\Http\Controllers\Admin\CustomerController::class);
     Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
     Route::resource('tasks', \App\Http\Controllers\Admin\TaskController::class);
+
+    Route::prefix('projects/{project}')->name('projects.')->group(function () {
+        Route::get('members', [\App\Http\Controllers\Admin\ProjectMemberController::class, 'index'])->name('members.index');
+        Route::post('members', [\App\Http\Controllers\Admin\ProjectMemberController::class, 'store'])->name('members.store');
+        Route::put('members/{member}', [\App\Http\Controllers\Admin\ProjectMemberController::class, 'update'])->name('members.update');
+        Route::delete('members/{member}', [\App\Http\Controllers\Admin\ProjectMemberController::class, 'destroy'])->name('members.destroy');
+
+        // Project Invitations
+        Route::post('invitations', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'store'])->name('invitations.store');
+        Route::delete('invitations/{invitation}', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'destroy'])->name('invitations.destroy');
+    });
+
+    // User Invitations
+    Route::prefix('invitations')->name('invitations.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'index'])->name('index');
+        Route::post('/{invitation}/accept', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'accept'])->name('accept');
+        Route::post('/{invitation}/reject', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'reject'])->name('reject');
+    });
+
     Route::put('tasks/{task}/status', [\App\Http\Controllers\Admin\TaskController::class, 'updateStatus'])->name('tasks.update-status');
 });

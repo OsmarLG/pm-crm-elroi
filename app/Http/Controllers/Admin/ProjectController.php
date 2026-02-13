@@ -30,15 +30,37 @@ class ProjectController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
-        \App\Models\Project::create($validated);
+        $project = \App\Models\Project::create($validated);
+
+        // Assign the authenticated user as the owner of the project
+        $project->users()->attach(auth()->id(), ['role' => 'owner']);
 
         return redirect()->route('admin.projects.index')->with('success', 'Project created successfully.');
     }
 
     public function edit(\App\Models\Project $project)
     {
+        $project->load([
+            'users',
+            'invitations' => function ($query) {
+                $query->where('status', 'pending');
+            }
+        ]);
         $customers = \App\Models\Customer::all();
-        return inertia('admin/projects/edit', ['project' => $project, 'customers' => $customers]);
+
+        $currentUser = auth()->user();
+        $userRole = 'member';
+
+        $member = $project->users->where('id', $currentUser->id)->first();
+        if ($member) {
+            $userRole = $member->pivot->role;
+        }
+
+        return inertia('admin/projects/edit', [
+            'project' => $project,
+            'customers' => $customers,
+            'user_role' => $userRole
+        ]);
     }
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Project $project)

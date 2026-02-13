@@ -31,6 +31,9 @@ export type NavItem = {
 
     // ✅ opcional: permite niveles infinitos
     children?: NavItem[]
+
+    // ✅ opcional: badge count
+    badge?: number
 }
 
 export interface SharedData {

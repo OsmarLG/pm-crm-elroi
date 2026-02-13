@@ -14,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, KeyRound, LayoutGrid, ShieldCheck, UserCog, Users, Notebook, NotebookText, Shield, Settings2, Bot } from 'lucide-react';
+import { BookOpen, Folder, KeyRound, LayoutGrid, ShieldCheck, UserCog, Users, Notebook, Shield, Settings2, Bot, Mail } from 'lucide-react';
 import AppLogo from './app-logo';
 import { usePage } from '@inertiajs/react';
 import { filterNavItems } from "@/utils/filter-nav-items";
@@ -25,6 +25,7 @@ type PageProps = {
         permissions: string[];
         roles: string[];
     };
+    invitations_count?: number;
 };
 
 const mainNavItems: NavItem[] = [
@@ -124,10 +125,45 @@ const adminFooterNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, invitations_count } = usePage<PageProps>().props;
     const permissions = auth.permissions ?? [];
 
-    const filteredMainNav = filterNavItems(mainNavItems, permissions);
+    // Collaborations Group
+    const collaborationNavItems: NavItem[] = [
+        {
+            title: "Collaborations",
+            // Collaborations group usually doesn't need a link itself, but it can be a group header if we change NavMain/NavTree structure
+            // But here we want it as a NavItem with children?
+            // Or just add these items to mainNavItems?
+            // "Invitations deberia salir dentro de otro... junto con invitations ir projects" -> Group "Collaborations"
+            // Let's create a "Collaborations" item in mainNavItems with children.
+            icon: Users, // Placeholder icon
+            href: "#", // No link for group parent
+            children: [
+                {
+                    title: "Projects",
+                    // @ts-ignore
+                    href: window.route('collaborations.projects.index'),
+                    icon: Folder,
+                },
+                {
+                    title: "Invitations",
+                    // @ts-ignore
+                    href: window.route('collaborations.invitations.index'),
+                    icon: Mail,
+                    badge: invitations_count && invitations_count > 0 ? invitations_count : undefined
+                }
+            ]
+        }
+    ];
+
+    // Combine Main Nav with Collaborations
+    const updatedMainNav = [
+        ...mainNavItems,
+        ...collaborationNavItems
+    ];
+
+    const filteredMainNav = filterNavItems(updatedMainNav, permissions);
     const filteredAdminNav = filterNavItems(adminNavItems, permissions);
 
     return (

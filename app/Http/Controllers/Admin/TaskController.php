@@ -13,7 +13,7 @@ class TaskController extends Controller
             return redirect()->route('admin.projects.index');
         }
 
-        $project = \App\Models\Project::with('customer')->findOrFail($request->project_id);
+        $project = \App\Models\Project::with(['customer', 'users'])->findOrFail($request->project_id);
 
         $tasks = \App\Models\Task::with(['assignee', 'project.customer'])
             ->where('project_id', $project->id)
@@ -21,12 +21,25 @@ class TaskController extends Controller
             ->get()
             ->groupBy('status');
 
+        $currentUser = auth()->user();
+        $userRole = 'member'; // Default or none?
+
         $users = \App\Models\User::all(['id', 'name']);
+
+        $member = $project->users()->where('user_id', $currentUser->id)->first();
+        if ($member) {
+            $userRole = $member->pivot->role;
+        } else if ($currentUser->hasRole('admin')) {
+            // Global admin override if applicable, otherwise just 'member' or null
+            // For now let's stick to project roles. If not member, maybe can't see project?
+            // But existing logic allowed it. Let's assume they are added.
+        }
 
         return inertia('admin/tasks/index', [
             'tasks' => $tasks,
             'project' => $project,
             'users' => $users,
+            'user_role' => $userRole,
         ]);
     }
 

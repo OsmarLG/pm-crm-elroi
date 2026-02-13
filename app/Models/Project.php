@@ -24,4 +24,28 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps();
+    }
+
+    public function invitations()
+    {
+        return $this->hasMany(ProjectInvitation::class);
+    }
+
+    public function owner()
+    {
+        return $this->users()->wherePivot('role', 'owner')->first();
+    }
+
+    public function admins()
+    {
+        return $this->users()->wherePivot('role', 'admin')->get();
+    }
+
+    public function members()
+    {
+        return $this->users()->wherePivot('role', 'member')->get();
+    }
 }

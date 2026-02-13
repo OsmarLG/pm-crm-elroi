@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Head, useForm, router } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
-import { Plus, ArrowLeft } from "lucide-react"
+import { Plus, ArrowLeft, Users, Shield, Trash2, UserPlus } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import {
     DndContext,
@@ -18,10 +18,14 @@ import {
     DragOverEvent,
     DragEndEvent,
 } from "@dnd-kit/core"
+
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { TaskColumn } from "./task-column"
 import { TaskCard } from "./task-card"
 import { toast } from "sonner"
+
+import ProjectMembersManager from "@/components/Admin/ProjectMembersManager"
+
 import {
     Dialog,
     DialogContent,
@@ -66,17 +70,26 @@ type Project = {
     customer: {
         name: string
     }
+    users: {
+        id: number
+        name: string
+        email: string
+        pivot: {
+            role: string
+        }
+    }[]
 }
 
 type Props = {
     tasks: Record<string, Task[]>
     project: Project
     users: { id: number; name: string }[]
+    user_role: string
 }
 
 const COLUMNS = ["todo", "in_progress", "done"]
 
-export default function TaskIndex({ tasks, project, users }: Props) {
+export default function TaskIndex({ tasks, project, users, user_role }: Props) {
     const { appearance } = useAppearance()
     const isDark = appearance === 'dark' || (appearance === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -96,6 +109,50 @@ export default function TaskIndex({ tasks, project, users }: Props) {
     })
 
     const [activeId, setActiveId] = useState<number | null>(null)
+    const [isMembersOpen, setIsMembersOpen] = useState(false)
+    const [inviteEmail, setInviteEmail] = useState("")
+    const [inviteRole, setInviteRole] = useState("member")
+
+    // Check if current user is owner or admin
+    // We assume the authenticated user is in the `users` prop or we can find them in project.users
+    // For now, let's rely on server-side validation or pass auth user separately if needed.
+    // But we can check permissions visually.
+
+    const handleInviteMember = (e: React.FormEvent) => {
+        e.preventDefault()
+        router.post(route('admin.projects.members.store', project.id), {
+            email: inviteEmail,
+            role: inviteRole
+        }, {
+            onSuccess: () => {
+                setInviteEmail("")
+                setInviteRole("member")
+                toast.success("Member invited successfully")
+                setIsMembersOpen(false)
+            },
+            onError: (errors) => {
+                toast.error("Failed to invite member")
+            }
+        })
+    }
+
+    const handleRemoveMember = (memberId: number) => {
+        if (confirm("Are you sure you want to remove this member?")) {
+            router.delete(route('admin.projects.members.destroy', [project.id, memberId]), {
+                onSuccess: () => toast.success("Member removed"),
+                onError: () => toast.error("Failed to remove member")
+            })
+        }
+    }
+
+    const handleUpdateRole = (memberId: number, newRole: string) => {
+        router.put(route('admin.projects.members.update', [project.id, memberId]), {
+            role: newRole
+        }, {
+            onSuccess: () => toast.success("Role updated"),
+            onError: () => toast.error("Failed to update role")
+        })
+    }
 
     useEffect(() => {
         const newItems: Record<string, Task[]> = {
@@ -343,141 +400,151 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                             </p>
                         </div>
                     </div>
-                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Task
+                    <div className="flex items-center gap-2">
+                        {user_role !== 'member' && (
+                            <Button onClick={() => setIsMembersOpen(true)} variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
+                                <Users className="h-4 w-4" />
+                                Members
                             </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0">
-                            <DialogHeader className="p-6 pb-2">
-                                <DialogTitle>Create New Task</DialogTitle>
-                            </DialogHeader>
-                            <div className="flex-1 overflow-y-auto p-6 pt-2 min-h-0">
-                                <form onSubmit={handleCreateSubmit} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="title">Title</Label>
-                                        <Input
-                                            id="title"
-                                            value={data.title}
-                                            onChange={(e) => setData("title", e.target.value)}
-                                            placeholder="Task title"
-                                            required
-                                        />
-                                        {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="status">Status</Label>
-                                            <Select
-                                                value={data.status}
-                                                onValueChange={(value) => setData("status", value)}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="todo">Todo</SelectItem>
-                                                    <SelectItem value="in_progress">In Progress</SelectItem>
-                                                    <SelectItem value="done">Done</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="priority">Priority</Label>
-                                            <Select
-                                                value={data.priority}
-                                                onValueChange={(value) => setData("priority", value)}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select priority" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="low">Low</SelectItem>
-                                                    <SelectItem value="medium">Medium</SelectItem>
-                                                    <SelectItem value="high">High</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.priority && <p className="text-sm text-destructive">{errors.priority}</p>}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
-                                        <Label htmlFor="description">Description</Label>
-                                        <MDEditor
-                                            value={data.description}
-                                            onChange={(val) => setData("description", val || "")}
-                                            height={200}
-                                            preview="edit"
-                                        />
-                                        {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
-                                    </div>
-                                    <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
-                                        <Label htmlFor="result_explanation">Result Explanation</Label>
-                                        <MDEditor
-                                            value={data.result_explanation}
-                                            onChange={(val) => setData("result_explanation", val || "")}
-                                            height={150}
-                                            preview="edit"
-                                        />
-                                        {errors.result_explanation && <p className="text-sm text-destructive">{errors.result_explanation}</p>}
-                                    </div>
+                        )}
+                        {user_role !== 'member' && (
+                            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                                <DialogTrigger asChild>
+                                    <Button>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Task
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0">
+                                    <DialogHeader className="p-6 pb-2">
+                                        <DialogTitle>Create New Task</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="flex-1 overflow-y-auto p-6 pt-2 min-h-0">
+                                        <form onSubmit={handleCreateSubmit} className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="title">Title</Label>
+                                                <Input
+                                                    id="title"
+                                                    value={data.title}
+                                                    onChange={(e) => setData("title", e.target.value)}
+                                                    placeholder="Task title"
+                                                    required
+                                                />
+                                                {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="status">Status</Label>
+                                                    <Select
+                                                        value={data.status}
+                                                        onValueChange={(value) => setData("status", value)}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select status" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="todo">Todo</SelectItem>
+                                                            <SelectItem value="in_progress">In Progress</SelectItem>
+                                                            <SelectItem value="done">Done</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="priority">Priority</Label>
+                                                    <Select
+                                                        value={data.priority}
+                                                        onValueChange={(value) => setData("priority", value)}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select priority" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="low">Low</SelectItem>
+                                                            <SelectItem value="medium">Medium</SelectItem>
+                                                            <SelectItem value="high">High</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {errors.priority && <p className="text-sm text-destructive">{errors.priority}</p>}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
+                                                <Label htmlFor="description">Description</Label>
+                                                <MDEditor
+                                                    value={data.description}
+                                                    onChange={(val) => setData("description", val || "")}
+                                                    height={200}
+                                                    preview="edit"
+                                                />
+                                                {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                                            </div>
+                                            <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
+                                                <Label htmlFor="result_explanation">Result Explanation</Label>
+                                                <MDEditor
+                                                    value={data.result_explanation}
+                                                    onChange={(val) => setData("result_explanation", val || "")}
+                                                    height={150}
+                                                    preview="edit"
+                                                />
+                                                {errors.result_explanation && <p className="text-sm text-destructive">{errors.result_explanation}</p>}
+                                            </div>
 
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="assigned_to">Assignee</Label>
-                                            <Select
-                                                value={data.assigned_to}
-                                                onValueChange={(value) => setData("assigned_to", value)}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select assignee" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {users.map((user) => (
-                                                        <SelectItem key={user.id} value={user.id.toString()}>
-                                                            {user.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.assigned_to && <p className="text-sm text-destructive">{errors.assigned_to}</p>}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="start_date">Start Date</Label>
-                                            <Input
-                                                id="start_date"
-                                                type="date"
-                                                value={data.start_date}
-                                                onChange={(e) => setData("start_date", e.target.value)}
-                                            />
-                                            {errors.start_date && <p className="text-sm text-destructive">{errors.start_date}</p>}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="due_date">Due Date</Label>
-                                            <Input
-                                                id="due_date"
-                                                type="date"
-                                                value={data.due_date}
-                                                onChange={(e) => setData("due_date", e.target.value)}
-                                            />
-                                            {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
-                                        </div>
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="assigned_to">Assignee</Label>
+                                                    <Select
+                                                        value={data.assigned_to}
+                                                        onValueChange={(value) => setData("assigned_to", value)}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select assignee" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {users.map((user) => (
+                                                                <SelectItem key={user.id} value={user.id.toString()}>
+                                                                    {user.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {errors.assigned_to && <p className="text-sm text-destructive">{errors.assigned_to}</p>}
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="start_date">Start Date</Label>
+                                                    <Input
+                                                        id="start_date"
+                                                        type="date"
+                                                        value={data.start_date}
+                                                        onChange={(e) => setData("start_date", e.target.value)}
+                                                    />
+                                                    {errors.start_date && <p className="text-sm text-destructive">{errors.start_date}</p>}
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="due_date">Due Date</Label>
+                                                    <Input
+                                                        id="due_date"
+                                                        type="date"
+                                                        value={data.due_date}
+                                                        onChange={(e) => setData("due_date", e.target.value)}
+                                                    />
+                                                    {errors.due_date && <p className="text-sm text-destructive">{errors.due_date}</p>}
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-end gap-2 pt-4">
+                                                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit" disabled={processing}>
+                                                    {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                    Create
+                                                </Button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div className="flex justify-end gap-2 pt-4">
-                                        <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                            Cancel
-                                        </Button>
-                                        <Button type="submit" disabled={processing}>
-                                            {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                            Create
-                                        </Button>
-                                    </div>
-                                </form>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                    </div>
 
                     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                         <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 bg-background">
@@ -494,6 +561,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             onChange={(e) => setEditData("title", e.target.value)}
                                             placeholder="Task title"
                                             required
+                                            disabled={user_role === 'member'}
                                         />
                                         {errorsEdit.title && <p className="text-sm text-destructive">{errorsEdit.title}</p>}
                                     </div>
@@ -539,7 +607,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             value={editData.description}
                                             onChange={(val) => setEditData("description", val || "")}
                                             height={200}
-                                            preview="edit"
+                                            preview={user_role === 'member' ? "preview" : "edit"}
                                         />
                                         {errorsEdit.description && <p className="text-sm text-destructive">{errorsEdit.description}</p>}
                                     </div>
@@ -560,6 +628,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                             <Select
                                                 value={editData.assigned_to}
                                                 onValueChange={(value) => setEditData("assigned_to", value)}
+                                                disabled={user_role === 'member'}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select assignee" />
@@ -581,6 +650,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                                 type="date"
                                                 value={editData.start_date}
                                                 onChange={(e) => setEditData("start_date", e.target.value)}
+                                                disabled={user_role === 'member'}
                                             />
                                             {errorsEdit.start_date && <p className="text-sm text-destructive">{errorsEdit.start_date}</p>}
                                         </div>
@@ -591,6 +661,7 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                                 type="date"
                                                 value={editData.due_date}
                                                 onChange={(e) => setEditData("due_date", e.target.value)}
+                                                disabled={user_role === 'member'}
                                             />
                                             {errorsEdit.due_date && <p className="text-sm text-destructive">{errorsEdit.due_date}</p>}
                                         </div>
@@ -606,6 +677,15 @@ export default function TaskIndex({ tasks, project, users }: Props) {
                                     </div>
                                 </form>
                             </div>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={isMembersOpen} onOpenChange={setIsMembersOpen}>
+                        <DialogContent className="max-w-md bg-background">
+                            <DialogHeader>
+                                <DialogTitle>Project Members</DialogTitle>
+                            </DialogHeader>
+                            <ProjectMembersManager project={project} user_role={user_role} />
                         </DialogContent>
                     </Dialog>
 
