@@ -17,6 +17,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogClose,
 } from "@/components/ui/dialog"
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
@@ -27,11 +28,12 @@ import { Task } from "./index"
 type Props = {
     task: Task
     user_role: string
+    currentUserId: number
     onEdit: (task: Task) => void
     onDelete: (taskId: number) => void
 }
 
-export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
+export function TaskCard({ task, user_role, currentUserId, onEdit, onDelete }: Props) {
     const {
         attributes,
         listeners,
@@ -40,7 +42,8 @@ export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
         transition,
     } = useSortable({
         id: task.id,
-        disabled: user_role === 'member'
+        // Members can only drag tasks assigned to them
+        disabled: user_role === 'member' && task.assignee?.id !== currentUserId
     })
 
     const style = {
@@ -66,12 +69,13 @@ export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
         }
     }
 
-    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done';
+    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status.slug !== 'done';
     const isCompletedLate = task.completed_at && task.due_date && new Date(task.completed_at) > new Date(task.due_date);
+    const isDraggable = user_role !== 'member' || task.assignee?.id === currentUserId
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
-            <Card className={`cursor-move hover:shadow-md transition-shadow bg-card text-card-foreground group relative border-border ${user_role === 'member' ? 'cursor-default' : ''}`}>
+            <Card className={`${isDraggable ? 'cursor-move' : 'cursor-default'} hover:shadow-md transition-shadow bg-card text-card-foreground group relative border-border`}>
                 <div
                     className="absolute top-2 right-2 z-10"
                     onPointerDown={(e) => e.stopPropagation()}
@@ -119,14 +123,19 @@ export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
 
                 {/* View Details Modal */}
                 <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-                    <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+                    <DialogContent
+                        className="max-w-3xl max-h-[85vh] flex flex-col"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 {task.title}
                                 <Badge variant="outline" className={`ml-2 capitalize ${getPriorityColor(task.priority)}`}>
                                     {task.priority || 'medium'}
                                 </Badge>
-                                {task.status === 'done' && (
+                                {task.status.slug === 'done' && (
                                     <Badge variant="outline" className="ml-2 border-green-500 text-green-500 gap-1">
                                         <CheckCircle className="h-3 w-3" />
                                         Completed
@@ -203,7 +212,7 @@ export function TaskCard({ task, user_role, onEdit, onDelete }: Props) {
                                     Overdue
                                 </Badge>
                             )}
-                            {task.status === 'done' && isCompletedLate && (
+                            {task.status.slug === 'done' && isCompletedLate && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 gap-1 border-orange-500 text-orange-500">
                                     <Clock className="h-3 w-3" />
                                     Late

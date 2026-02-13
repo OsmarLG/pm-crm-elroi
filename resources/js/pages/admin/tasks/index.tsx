@@ -19,7 +19,7 @@ import {
     DragEndEvent,
 } from "@dnd-kit/core"
 
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
+import { arrayMove, sortableKeyboardCoordinates, SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable"
 import { TaskColumn } from "./task-column"
 import { TaskCard } from "./task-card"
 import { toast } from "sonner"
@@ -32,6 +32,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogClose,
 } from "@/components/ui/dialog"
 import { useAppearance } from "@/hooks/use-appearance"
 import { Input } from "@/components/ui/input"
@@ -47,7 +48,12 @@ export type Task = {
     id: number
     title: string
     description: string | null
-    status: string
+    status: {
+        id: number
+        name: string
+        slug: string
+        color: string | null
+    }
     priority: string
     result_explanation: string | null
     project: {
@@ -81,38 +87,63 @@ type Project = {
     }[]
 }
 
+type TaskStatus = {
+    id: number
+    name: string
+    slug: string
+    color: string | null
+    order_column: number
+    is_default: boolean
+}
+
 type Props = {
     tasks: Record<string, Task[]>
     project: Project
     users: { id: number; name: string }[]
     user_role: string
+    statuses: TaskStatus[]
 }
 
-const COLUMNS = ["todo", "in_progress", "done"]
-
-export default function TaskIndex({ tasks, project, users, user_role }: Props) {
+export default function TaskIndex({ tasks, project, users, user_role, statuses }: Props) {
     const { appearance } = useAppearance()
     const isDark = appearance === 'dark' || (appearance === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    const currentUserId = usePage<any>().props.auth.user.id
 
-    // Ensure all columns exist in initial state to prevent crashes
+    // Ensure all columns exist in initial state
     const [items, setItems] = useState<Record<string, Task[]>>(() => {
-        const initialTasks: Record<string, Task[]> = {
-            todo: [],
-            in_progress: [],
-            done: [],
-        }
-        COLUMNS.forEach(col => {
-            if (tasks[col]) {
-                initialTasks[col] = tasks[col]
-            }
+        const initialTasks: Record<string, Task[]> = {}
+        statuses.forEach(status => {
+            initialTasks[status.slug] = tasks[status.slug] || []
         })
         return initialTasks
     })
 
     const [activeId, setActiveId] = useState<number | null>(null)
+    const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
     const [isMembersOpen, setIsMembersOpen] = useState(false)
     const [inviteEmail, setInviteEmail] = useState("")
     const [inviteRole, setInviteRole] = useState("member")
+
+    // State for managing columns
+    const [isAddColumnOpen, setIsAddColumnOpen] = useState(false)
+    const [newColumnName, setNewColumnName] = useState("")
+    const [newColumnColor, setNewColumnColor] = useState("gray") // Default color
+
+    const handleAddColumn = (e: React.FormEvent) => {
+        e.preventDefault()
+        router.post(route('admin.projects.statuses.store', project.id), {
+            name: newColumnName,
+            color: newColumnColor
+        }, {
+            onSuccess: () => {
+                setIsAddColumnOpen(false)
+                setNewColumnName("")
+                toast.success("Column added successfully")
+            },
+            onError: () => toast.error("Failed to add column")
+        })
+    }
+
 
     // Check if current user is owner or admin
     // We assume the authenticated user is in the `users` prop or we can find them in project.users
@@ -156,18 +187,21 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
     }
 
     useEffect(() => {
-        const newItems: Record<string, Task[]> = {
-            todo: [],
-            in_progress: [],
-            done: [],
-        }
-        COLUMNS.forEach(col => {
-            if (tasks[col]) {
-                newItems[col] = tasks[col]
-            }
+        const newItems: Record<string, Task[]> = {}
+        statuses.forEach(status => {
+            newItems[status.slug] = tasks[status.slug] || []
         })
         setItems(newItems)
-    }, [tasks])
+    }, [tasks, statuses])
+
+    // Auto-refresh every 30 seconds to keep tasks synchronized
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ['tasks'] })
+        }, 30000) // 30 seconds
+
+        return () => clearInterval(interval)
+    }, [])
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -338,7 +372,7 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
         setEditData({
             title: task.title,
             description: task.description || "",
-            status: task.status,
+            status: task.status.slug,
             priority: task.priority || "medium",
             result_explanation: task.result_explanation || "",
             assigned_to: task.assignee ? task.assignee.id.toString() : "",
@@ -366,6 +400,102 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
     const handleDelete = (taskId: number) => {
         setTaskToDelete(taskId)
         setIsDeleteOpen(true)
+    }
+
+    const [editingColumn, setEditingColumn] = useState<TaskStatus | null>(null)
+    const [isEditColumnOpen, setIsEditColumnOpen] = useState(false)
+    const [editColumnName, setEditColumnName] = useState("")
+    const [editColumnColor, setEditColumnColor] = useState("gray")
+
+    const [columnToDelete, setColumnToDelete] = useState<number | null>(null)
+    const [isDeleteColumnOpen, setIsDeleteColumnOpen] = useState(false)
+
+    const handleEditColumn = (status: TaskStatus) => {
+        setEditingColumn(status)
+        setEditColumnName(status.name)
+        setEditColumnColor(status.color || "gray")
+        setIsEditColumnOpen(true)
+    }
+
+    const handleEditColumnSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!editingColumn) return
+
+        router.put(route('admin.projects.statuses.update', [project.id, editingColumn.id]), {
+            name: editColumnName,
+            color: editColumnColor
+        }, {
+            onSuccess: () => {
+                setIsEditColumnOpen(false)
+                setEditingColumn(null)
+                toast.success("Column updated successfully")
+            },
+            onError: () => toast.error("Failed to update column")
+        })
+    }
+
+    const handleDeleteColumn = (statusId: number) => {
+        setColumnToDelete(statusId)
+        setIsDeleteColumnOpen(true)
+    }
+
+    const confirmDeleteColumn = () => {
+        if (!columnToDelete) return
+
+        router.delete(route('admin.projects.statuses.destroy', [project.id, columnToDelete]), {
+            onSuccess: () => {
+                setIsDeleteColumnOpen(false)
+                setColumnToDelete(null)
+                toast.success("Column deleted successfully")
+            },
+            onError: () => toast.error("Failed to delete column")
+        })
+    }
+
+    const handleMoveColumnLeft = (statusId: number) => {
+        const currentIndex = statuses.findIndex(s => s.id === statusId)
+        if (currentIndex <= 0) return // Already at the start
+
+        const newStatuses = [...statuses]
+        const temp = newStatuses[currentIndex]
+        newStatuses[currentIndex] = newStatuses[currentIndex - 1]
+        newStatuses[currentIndex - 1] = temp
+
+        // Update order_column for all statuses
+        const updatedStatuses = newStatuses.map((status, index) => ({
+            id: status.id,
+            order_column: index
+        }))
+
+        router.put(route('admin.projects.statuses.reorder', project.id), {
+            statuses: updatedStatuses
+        }, {
+            onSuccess: () => toast.success("Column moved successfully"),
+            onError: () => toast.error("Failed to move column")
+        })
+    }
+
+    const handleMoveColumnRight = (statusId: number) => {
+        const currentIndex = statuses.findIndex(s => s.id === statusId)
+        if (currentIndex >= statuses.length - 1) return // Already at the end
+
+        const newStatuses = [...statuses]
+        const temp = newStatuses[currentIndex]
+        newStatuses[currentIndex] = newStatuses[currentIndex + 1]
+        newStatuses[currentIndex + 1] = temp
+
+        // Update order_column for all statuses
+        const updatedStatuses = newStatuses.map((status, index) => ({
+            id: status.id,
+            order_column: index
+        }))
+
+        router.put(route('admin.projects.statuses.reorder', project.id), {
+            statuses: updatedStatuses
+        }, {
+            onSuccess: () => toast.success("Column moved successfully"),
+            onError: () => toast.error("Failed to move column")
+        })
     }
 
     const confirmDelete = () => {
@@ -444,9 +574,11 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                                             <SelectValue placeholder="Select status" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="todo">Todo</SelectItem>
-                                                            <SelectItem value="in_progress">In Progress</SelectItem>
-                                                            <SelectItem value="done">Done</SelectItem>
+                                                            {statuses.map((status) => (
+                                                                <SelectItem key={status.id} value={status.slug}>
+                                                                    {status.name}
+                                                                </SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
                                                     {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
@@ -578,9 +710,11 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="todo">Todo</SelectItem>
-                                                    <SelectItem value="in_progress">In Progress</SelectItem>
-                                                    <SelectItem value="done">Done</SelectItem>
+                                                    {statuses.map((status) => (
+                                                        <SelectItem key={status.id} value={status.slug}>
+                                                            {status.name}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                             {errorsEdit.status && <p className="text-sm text-destructive">{errorsEdit.status}</p>}
@@ -758,22 +892,151 @@ export default function TaskIndex({ tasks, project, users, user_role }: Props) {
                     onDragEnd={handleDragEnd}
                 >
                     <div className="flex gap-4 h-full overflow-x-auto pb-4 items-start">
-                        {COLUMNS.map((col) => (
+                        {statuses.map((status, index) => (
                             <TaskColumn
-                                key={col}
-                                id={col}
-                                title={col.replace("_", " ").toUpperCase()}
-                                tasks={items[col] || []}
+                                key={status.slug}
+                                status={status}
+                                tasks={items[status.slug] || []}
                                 user_role={user_role}
+                                currentUserId={currentUserId}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
+                                onEditColumn={handleEditColumn}
+                                onDeleteColumn={handleDeleteColumn}
+                                onMoveLeft={handleMoveColumnLeft}
+                                onMoveRight={handleMoveColumnRight}
+                                isFirst={index === 0}
+                                isLast={index === statuses.length - 1}
                             />
                         ))}
+
+                        {/* Add Column Button */}
+                        {user_role !== 'member' && (
+                            <div className="shrink-0 w-80">
+                                <Dialog open={isAddColumnOpen} onOpenChange={setIsAddColumnOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="w-full text-muted-foreground border-dashed h-12">
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Add Column
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Add New Column</DialogTitle>
+                                        </DialogHeader>
+                                        <form onSubmit={handleAddColumn} className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="column-name">Column Name</Label>
+                                                <Input
+                                                    id="column-name"
+                                                    value={newColumnName}
+                                                    onChange={(e) => setNewColumnName(e.target.value)}
+                                                    placeholder="e.g. Review, Testing"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="column-color">Color</Label>
+                                                <Select value={newColumnColor} onValueChange={setNewColumnColor}>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="gray">Gray</SelectItem>
+                                                        <SelectItem value="blue">Blue</SelectItem>
+                                                        <SelectItem value="green">Green</SelectItem>
+                                                        <SelectItem value="yellow">Yellow</SelectItem>
+                                                        <SelectItem value="red">Red</SelectItem>
+                                                        <SelectItem value="purple">Purple</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="flex justify-end gap-2">
+                                                <Button type="button" variant="outline" onClick={() => setIsAddColumnOpen(false)}>
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit">
+                                                    Add Column
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        )}
                     </div>
                     <DragOverlay>
-                        {activeId ? <TaskCard task={Object.values(items).flat().find((t) => t.id === activeId)!} user_role={user_role} onEdit={() => { }} onDelete={() => { }} /> : null}
+                        {activeId ? <TaskCard task={Object.values(items).flat().find((t) => t.id === activeId)!} user_role={user_role} currentUserId={currentUserId} onEdit={() => { }} onDelete={() => { }} /> : null}
                     </DragOverlay>
                 </DndContext>
+
+                {/* Edit Column Dialog */}
+                <Dialog open={isEditColumnOpen} onOpenChange={setIsEditColumnOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Column</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleEditColumnSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-column-name">Column Name</Label>
+                                <Input
+                                    id="edit-column-name"
+                                    value={editColumnName}
+                                    onChange={(e) => setEditColumnName(e.target.value)}
+                                    placeholder="Column Name"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-column-color">Color</Label>
+                                <Select value={editColumnColor} onValueChange={setEditColumnColor}>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="gray">Gray</SelectItem>
+                                        <SelectItem value="blue">Blue</SelectItem>
+                                        <SelectItem value="green">Green</SelectItem>
+                                        <SelectItem value="yellow">Yellow</SelectItem>
+                                        <SelectItem value="red">Red</SelectItem>
+                                        <SelectItem value="purple">Purple</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button type="button" variant="outline" onClick={() => setIsEditColumnOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit">
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Delete Column Dialog */}
+                <Dialog open={isDeleteColumnOpen} onOpenChange={setIsDeleteColumnOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Column</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p>Are you sure you want to delete this column?</p>
+                            <p className="text-sm text-muted-foreground mt-2">
+                                Tasks in this column will be moved to the first available column (Backlog/Todo).
+                            </p>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setIsDeleteColumnOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={confirmDeleteColumn}>
+                                Delete
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     )

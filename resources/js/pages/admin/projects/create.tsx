@@ -1,15 +1,16 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Head, Link, useForm } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
+import MDEditor from "@uiw/react-md-editor"
 
 // @ts-ignore
 const route = window.route;
@@ -46,6 +47,28 @@ export default function ProjectCreate({ customers }: Props) {
         { title: "Projects", href: route("admin.projects.index") },
         { title: "Create", href: route("admin.projects.create") },
     ]
+
+    const [theme, setTheme] = useState<"light" | "dark">("light")
+
+    useEffect(() => {
+        const isDark = document.documentElement.classList.contains("dark")
+        setTheme(isDark ? "dark" : "light")
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === "class") {
+                    const isDark = document.documentElement.classList.contains("dark")
+                    setTheme(isDark ? "dark" : "light")
+                }
+            })
+        })
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+        })
+
+        return () => observer.disconnect()
+    }, [])
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -120,15 +143,15 @@ export default function ProjectCreate({ customers }: Props) {
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        value={data.description}
-                                        onChange={(e) => setData("description", e.target.value)}
-                                        placeholder="Project details..."
-                                        rows={4}
-                                        className="resize-none"
-                                    />
+                                    <Label htmlFor="description">Description (Markdown)</Label>
+                                    <div data-color-mode={theme}>
+                                        <MDEditor
+                                            value={data.description}
+                                            onChange={(val) => setData("description", val || "")}
+                                            height={200}
+                                            preview="edit"
+                                        />
+                                    </div>
                                     {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                 </div>
 

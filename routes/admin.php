@@ -117,6 +117,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Project Invitations
         Route::post('invitations', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'store'])->name('invitations.store');
         Route::delete('invitations/{invitation}', [\App\Http\Controllers\Admin\ProjectInvitationController::class, 'destroy'])->name('invitations.destroy');
+
+        // Task Statuses
+        Route::post('statuses', [\App\Http\Controllers\Admin\TaskStatusController::class, 'store'])->name('statuses.store');
+        Route::put('statuses/reorder', [\App\Http\Controllers\Admin\TaskStatusController::class, 'reorder'])->name('statuses.reorder');
+        Route::put('statuses/{taskStatus}', [\App\Http\Controllers\Admin\TaskStatusController::class, 'update'])->name('statuses.update');
+        Route::delete('statuses/{taskStatus}', [\App\Http\Controllers\Admin\TaskStatusController::class, 'destroy'])->name('statuses.destroy');
     });
 
     // User Invitations

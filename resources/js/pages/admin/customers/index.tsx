@@ -1,8 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog"
 import {
     Table,
     TableBody,
@@ -34,13 +42,25 @@ type Props = {
 }
 
 export default function CustomerIndex({ customers }: Props) {
+    const [customerToDelete, setCustomerToDelete] = useState<number | null>(null)
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
     const handleDelete = (id: number) => {
-        if (confirm("Are you sure you want to delete this customer?")) {
-            router.delete(route("admin.customers.destroy", id), {
-                onSuccess: () => toast.success("Customer deleted"),
-                onError: () => toast.error("Failed to delete customer"),
-            })
-        }
+        setCustomerToDelete(id)
+        setIsDeleteOpen(true)
+    }
+
+    const confirmDelete = () => {
+        if (!customerToDelete) return
+
+        router.delete(route("admin.customers.destroy", customerToDelete), {
+            onSuccess: () => {
+                toast.success("Customer deleted")
+                setIsDeleteOpen(false)
+                setCustomerToDelete(null)
+            },
+            onError: () => toast.error("Failed to delete customer"),
+        })
     }
 
     const breadcrumbs = [
@@ -115,6 +135,28 @@ export default function CustomerIndex({ customers }: Props) {
                         </Table>
                     </div>
                 </div>
+
+                <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Customer</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p>Are you sure you want to delete this customer?</p>
+                            <p className="text-sm text-muted-foreground mt-2">
+                                This action cannot be undone.
+                            </p>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={confirmDelete}>
+                                Delete
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     )

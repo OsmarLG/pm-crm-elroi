@@ -13,26 +13,28 @@ class TaskController extends Controller
             return redirect()->route('admin.projects.index');
         }
 
-        $project = \App\Models\Project::with(['customer', 'users'])->findOrFail($request->project_id);
+        $project = \App\Models\Project::with(['customer', 'users', 'taskStatuses'])->findOrFail($request->project_id);
 
-        $tasks = \App\Models\Task::with(['assignee', 'project.customer'])
+        $tasksQuery = \App\Models\Task::with(['assignee', 'project.customer', 'status'])
             ->where('project_id', $project->id)
-            ->orderBy('order_column')
-            ->get()
-            ->groupBy('status');
+            ->orderBy('order_column');
+
+        $tasksCollection = $tasksQuery->get();
+
+        // Group by status slug
+        $tasks = $project->taskStatuses->mapWithKeys(function ($status) use ($tasksCollection) {
+            return [$status->slug => $tasksCollection->where('task_status_id', $status->id)->values()];
+        });
 
         $currentUser = auth()->user();
-        $userRole = 'member'; // Default or none?
+        $userRole = 'member';
 
-        $users = \App\Models\User::all(['id', 'name']);
+        // Only get users who are members of this project
+        $users = $project->users()->select('users.id', 'users.name')->get();
 
         $member = $project->users()->where('user_id', $currentUser->id)->first();
         if ($member) {
             $userRole = $member->pivot->role;
-        } else if ($currentUser->hasRole('admin')) {
-            // Global admin override if applicable, otherwise just 'member' or null
-            // For now let's stick to project roles. If not member, maybe can't see project?
-            // But existing logic allowed it. Let's assume they are added.
         }
 
         return inertia('admin/tasks/index', [
@@ -40,24 +42,29 @@ class TaskController extends Controller
             'project' => $project,
             'users' => $users,
             'user_role' => $userRole,
+            'statuses' => $project->taskStatuses, // Pass dynamic statuses to frontend
         ]);
     }
 
     public function updateStatus(\Illuminate\Http\Request $request, \App\Models\Task $task)
     {
         $validated = $request->validate([
-            'status' => 'required|string',
+            'status' => 'required|string', // This is the slug
             'order_column' => 'required|integer',
         ]);
 
-        if ($validated['status'] === 'done' && $task->status !== 'done') {
+        $project = $task->project;
+        $statusModel = $project->taskStatuses()->where('slug', $validated['status'])->firstOrFail();
+
+        // Check for completion
+        if ($statusModel->slug === 'done' && $task->status?->slug !== 'done') {
             $task->completed_at = now();
-        } elseif ($validated['status'] !== 'done' && $task->status === 'done') {
+        } elseif ($validated['status'] !== 'done' && $task->status?->slug === 'done') {
             $task->completed_at = null;
         }
 
         $task->update([
-            'status' => $validated['status'],
+            'task_status_id' => $statusModel->id,
             'order_column' => $validated['order_column'],
             'completed_at' => $task->completed_at
         ]);
@@ -73,43 +80,53 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'required|string|in:low,medium,high',
             'result_explanation' => 'nullable|string',
-            'status' => 'required|string',
+            'status' => 'required|string', // slug
             'assigned_to' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
         ]);
 
-        \App\Models\Task::create($validated);
+        $project = \App\Models\Project::findOrFail($validated['project_id']);
+        $statusModel = $project->taskStatuses()->where('slug', $validated['status'])->firstOrFail();
+
+        $data = $validated;
+        unset($data['status']);
+        $data['task_status_id'] = $statusModel->id;
+
+        \App\Models\Task::create($data);
 
         return back()->with('success', 'Task created successfully.');
     }
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Task $task)
     {
-        // Permission check for members
-        // Assuming we pass user_role from frontend, but backend verification is better.
-        // For now, let's allow "Result Explanation" and "Status" updates for members, 
-        // but block other fields if they are trying to change them.
-        // Simplified: Trust the validated data but we should really checkAuth.
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|string|in:low,medium,high',
             'result_explanation' => 'nullable|string',
-            'status' => 'required|string',
+            'status' => 'required|string', // slug
             'assigned_to' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
         ]);
 
-        if ($validated['status'] === 'done' && $task->status !== 'done') {
+        $project = $task->project;
+        $statusModel = $project->taskStatuses()->where('slug', $validated['status'])->firstOrFail();
+
+        // Check for completion logic based on 'done' slug
+        if ($statusModel->slug === 'done' && $task->status?->slug !== 'done') {
             $task->completed_at = now();
-        } elseif ($validated['status'] !== 'done' && $task->status === 'done') {
+        } elseif ($statusModel->slug !== 'done' && $task->status?->slug === 'done') {
             $task->completed_at = null;
         }
 
-        $task->update(array_merge($validated, ['completed_at' => $task->completed_at]));
+        $data = $validated;
+        unset($data['status']);
+        $data['task_status_id'] = $statusModel->id;
+        $data['completed_at'] = $task->completed_at;
+
+        $task->update($data);
 
         return back()->with('success', 'Task updated successfully.');
     }

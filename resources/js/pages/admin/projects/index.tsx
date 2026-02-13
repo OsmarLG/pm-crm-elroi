@@ -1,8 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog"
 import {
     Table,
     TableBody,
@@ -50,13 +58,25 @@ const statusColors: Record<string, "default" | "secondary" | "destructive" | "ou
 }
 
 export default function ProjectIndex({ projects }: Props) {
+    const [projectToDelete, setProjectToDelete] = useState<number | null>(null)
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
     const handleDelete = (id: number) => {
-        if (confirm("Are you sure you want to delete this project?")) {
-            router.delete(route("admin.projects.destroy", id), {
-                onSuccess: () => toast.success("Project deleted"),
-                onError: () => toast.error("Failed to delete project"),
-            })
-        }
+        setProjectToDelete(id)
+        setIsDeleteOpen(true)
+    }
+
+    const confirmDelete = () => {
+        if (!projectToDelete) return
+
+        router.delete(route("admin.projects.destroy", projectToDelete), {
+            onSuccess: () => {
+                toast.success("Project deleted")
+                setIsDeleteOpen(false)
+                setProjectToDelete(null)
+            },
+            onError: () => toast.error("Failed to delete project"),
+        })
     }
 
     const breadcrumbs = [
@@ -137,6 +157,28 @@ export default function ProjectIndex({ projects }: Props) {
                         </Table>
                     </div>
                 </div>
+
+                <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Project</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p>Are you sure you want to delete this project?</p>
+                            <p className="text-sm text-muted-foreground mt-2">
+                                This action cannot be undone. All tasks and data associated with this project will be permanently deleted.
+                            </p>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={confirmDelete}>
+                                Delete
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     )
