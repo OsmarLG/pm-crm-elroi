@@ -293,7 +293,8 @@
     }
 
     /* Fix for Radix UI Dialog removing overflow from body */
-    html, body {
+    html,
+    body {
         overflow-y: auto !important;
         overflow-x: hidden !important;
     }
@@ -317,6 +318,18 @@
 /* Editor theme compatibility - minimal, non-invasive styling */
 .w-md-editor {
     border-radius: calc(var(--radius) - 2px);
+}
+
+/* Fix for MDEditor transparency (Global and Fullscreen) */
+.w-md-editor,
+.w-md-editor-content,
+.w-md-editor-toolbar,
+.w-md-editor-fullscreen {
+    background-color: var(--background) !important;
+}
+
+.w-md-editor.w-md-editor-fullscreen {
+    z-index: 9999 !important;
 }
 
 /* 
