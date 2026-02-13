@@ -313,15 +313,78 @@
     border-radius: calc(var(--radius) - 2px);
 }
 
-/* Scroll independiente en ambos paneles - SOLO esto */
+/* 
+ * Layout Grid Estricto 
+ * Usamos Grid en lugar de Flex para forzar anchos iguales (50/50)
+ */
 .w-md-editor-content {
-    display: flex;
-    overflow: hidden;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    overflow: hidden !important;
+}
+
+/* Si solo hay un hijo (edit o preview solo), ocupa todo el ancho */
+.w-md-editor-content:has(> :only-child) {
+    grid-template-columns: 1fr !important;
 }
 
 .w-md-editor-text,
 .w-md-editor-preview {
-    overflow-y: auto;
-    overflow-x: auto;
-    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    /* Ocultar scroll horizontal para forzar wrap */
+    height: 100% !important;
+}
+
+/* 
+ * SOLUCIÓN DEFINITIVA: Desactivar Syntax Highlighting en Editor
+ * El "ghosting" ocurre por desalineación entre textarea y pre.
+ * Eliminamos la capa visual 'pre' y hacemos el textarea opaco.
+ */
+
+/* 1. Ocultar la capa de syntax highlighting (Causa del desfase) */
+.w-md-editor-text-pre {
+    display: none !important;
+}
+
+/* 2. Hacer el textarea totalmente visible y normal */
+.w-md-editor-text textarea {
+    /* Color basado en variables del tema (asegura visibilidad en dark/light) */
+    color: var(--foreground) !important;
+    caret-color: var(--foreground) !important;
+    background: transparent !important;
+
+    /* RESET CRÍTICO: Eliminar transparencia que pone la librería */
+    -webkit-text-fill-color: unset !important;
+    text-fill-color: unset !important;
+    opacity: 1 !important;
+
+    z-index: 1;
+
+    /* Asegurar wrapping correcto */
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+
+    /* Tipografía consistente */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+
+    /* Spacing */
+    padding: 10px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    /* Scroll Vertical: FUNDAMENTAL */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Fallback específico si las variables fallan */
+.dark .w-md-editor-text textarea {
+    color: #e5e5e5 !important;
+    caret-color: #e5e5e5 !important;
 }
