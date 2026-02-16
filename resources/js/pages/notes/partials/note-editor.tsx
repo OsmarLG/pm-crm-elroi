@@ -216,7 +216,7 @@ export function NoteEditor({
       <div className="space-y-2">
         <Label>Content</Label>
 
-        <div data-color-mode={colorMode} className="rounded-md border overflow-hidden">
+        <div data-color-mode={colorMode} className="md-editor-notes rounded-md border overflow-hidden">
           <MDEditor
             value={content}
             onChange={(v) => setContent(v ?? "")}

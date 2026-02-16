@@ -6,6 +6,8 @@ import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
 import { Plus, ArrowLeft, Users, Shield, Trash2, UserPlus } from "lucide-react"
 import { Link } from "@inertiajs/react"
+import MDEditorCompact from "@/components/Markdown/MDEditorCompact"
+
 import {
     DndContext,
     DragOverlay,
@@ -601,27 +603,32 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                                                     {errors.priority && <p className="text-sm text-destructive">{errors.priority}</p>}
                                                 </div>
                                             </div>
-                                            <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="description">Description</Label>
-                                                <MDEditor
+
+                                                <MDEditorCompact
+                                                    colorMode={isDark ? "dark" : "light"}
                                                     value={data.description}
-                                                    onChange={(val) => setData("description", val || "")}
+                                                    onChange={(val) => setData("description", val)}
                                                     height={200}
                                                     preview="edit"
                                                 />
+
                                                 {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                             </div>
-                                            <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="result_explanation">Result Explanation</Label>
-                                                <MDEditor
+
+                                                <MDEditorCompact
+                                                    colorMode={isDark ? "dark" : "light"}
                                                     value={data.result_explanation}
-                                                    onChange={(val) => setData("result_explanation", val || "")}
+                                                    onChange={(val) => setData("result_explanation", val)}
                                                     height={150}
                                                     preview="edit"
                                                 />
+
                                                 {errors.result_explanation && <p className="text-sm text-destructive">{errors.result_explanation}</p>}
                                             </div>
-
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2 md:col-span-2">
                                                     <Label htmlFor="assigned_to">Assignee</Label>
@@ -740,31 +747,33 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                                     </div>
                                     <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
                                         <Label htmlFor="edit-description">Description</Label>
-                                        <MDEditor
+                                        <MDEditorCompact
+                                            colorMode={isDark ? "dark" : "light"}
                                             value={editData.description}
-                                            onChange={(val) => setEditData("description", val || "")}
+                                            onChange={(val) => setEditData("description", val)}
                                             height={200}
-                                            preview={user_role === 'member' ? "preview" : "edit"}
-                                            hideToolbar={user_role === 'member'}
-                                            visibleDragbar={user_role !== 'member'}
+                                            preview={user_role === "member" ? "preview" : "edit"}
+                                            hideToolbar={user_role === "member"}
+                                            visibleDragbar={user_role !== "member"}
                                         />
                                         {errorsEdit.description && <p className="text-sm text-destructive">{errorsEdit.description}</p>}
                                     </div>
                                     <div className="space-y-2" data-color-mode={isDark ? 'dark' : 'light'}>
                                         <Label htmlFor="edit-result_explanation">Result Explanation</Label>
-                                        <MDEditor
+                                        <MDEditorCompact
+                                            colorMode={isDark ? "dark" : "light"}
                                             value={editData.result_explanation}
-                                            onChange={(val) => setEditData("result_explanation", val || "")}
+                                            onChange={(val) => setEditData("result_explanation", val)}
                                             height={150}
-                                            // Member can edit ONLY IF assigned to them.
-                                            // If user_role is member AND (task is NOT assigned OR assigned to someone else) -> preview only
                                             preview={
-                                                user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id
+                                                user_role === "member" && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id
                                                     ? "preview"
                                                     : "edit"
                                             }
-                                            hideToolbar={user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id}
-                                            visibleDragbar={!(user_role === 'member' && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id)}
+                                            hideToolbar={user_role === "member" && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id}
+                                            visibleDragbar={!(
+                                                user_role === "member" && editingTask?.assignee?.id !== usePage<any>().props.auth.user.id
+                                            )}
                                         />
                                         {errorsEdit.result_explanation && <p className="text-sm text-destructive">{errorsEdit.result_explanation}</p>}
                                     </div>

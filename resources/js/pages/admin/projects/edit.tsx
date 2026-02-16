@@ -6,14 +6,13 @@ import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, ArrowLeft, Edit2, Lock } from "lucide-react"
 import { toast } from "sonner"
 // Use correct casing matching filesystem
 import ProjectMembersManager from "@/components/Admin/ProjectMembersManager"
-import MDEditor from "@uiw/react-md-editor"
+import MDEditorCompact from "@/components/Markdown/MDEditorCompact"
 
 // @ts-ignore
 const route = window.route;
@@ -99,10 +98,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
             })
         })
 
-        observer.observe(document.documentElement, {
-            attributes: true,
-        })
-
+        observer.observe(document.documentElement, { attributes: true })
         return () => observer.disconnect()
     }, [])
 
@@ -115,7 +111,6 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Project" />
             <div className="p-4 w-full mx-auto space-y-6">
-                {/* ... header ... */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" asChild>
@@ -220,32 +215,38 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="description">Description (Markdown)</Label>
-                                            <div data-color-mode={theme}>
-                                                <MDEditor
-                                                    value={data.description}
-                                                    onChange={(val) => isEditingMode && canEditPermission && setData("description", val || "")}
-                                                    height={200}
-                                                    preview={isEditingMode ? "edit" : "preview"}
-                                                    visibleDragbar={isEditingMode && canEditPermission}
-                                                    hideToolbar={!isEditingMode || !canEditPermission}
-                                                />
-                                            </div>
+
+                                            <MDEditorCompact
+                                                colorMode={theme}
+                                                value={data.description}
+                                                onChange={(val) => {
+                                                    if (isEditingMode && canEditPermission) setData("description", val)
+                                                }}
+                                                height={200}
+                                                preview={isEditingMode ? "edit" : "preview"}
+                                                visibleDragbar={isEditingMode && canEditPermission}
+                                                hideToolbar={!isEditingMode || !canEditPermission}
+                                            />
+
                                             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                         </div>
 
                                         {user_role === 'owner' && (
                                             <div className="space-y-2 md:col-span-2">
                                                 <Label htmlFor="confidential_info">Confidential Information (Markdown) - Owner Only</Label>
-                                                <div data-color-mode={theme}>
-                                                    <MDEditor
-                                                        value={data.confidential_info}
-                                                        onChange={(val) => isEditingMode && setData("confidential_info", val || "")}
-                                                        height={200}
-                                                        preview={isEditingMode ? "edit" : "preview"}
-                                                        visibleDragbar={isEditingMode}
-                                                        hideToolbar={!isEditingMode}
-                                                    />
-                                                </div>
+
+                                                <MDEditorCompact
+                                                    colorMode={theme}
+                                                    value={data.confidential_info}
+                                                    onChange={(val) => {
+                                                        if (isEditingMode) setData("confidential_info", val)
+                                                    }}
+                                                    height={200}
+                                                    preview={isEditingMode ? "edit" : "preview"}
+                                                    visibleDragbar={isEditingMode}
+                                                    hideToolbar={!isEditingMode}
+                                                />
+
                                                 {errors.confidential_info && <p className="text-sm text-destructive">{errors.confidential_info}</p>}
                                             </div>
                                         )}
@@ -261,6 +262,7 @@ export default function ProjectEdit({ project, customers, user_role }: Props) {
                                             />
                                             {errors.start_date && <p className="text-sm text-destructive">{errors.start_date}</p>}
                                         </div>
+
                                         <div className="space-y-2">
                                             <Label htmlFor="due_date">Due Date</Label>
                                             <Input

@@ -114,7 +114,7 @@ export function NoteFullscreenDialog({
 
                     {/* Body */}
                     <div className="bg-background" style={{ height: 'calc(100vh - 3.5rem)' }}>
-                        <div className="h-full" data-color-mode={colorMode}>
+                        <div className="md-editor-notes h-full" data-color-mode={colorMode}>
                             <MDEditor
                                 value={localContent}
                                 onChange={(v) => setLocalContent(v ?? "")}
