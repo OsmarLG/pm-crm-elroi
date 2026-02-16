@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Head, useForm, router, usePage } from "@inertiajs/react"
 import AppLayout from "@/layouts/app-layout"
 import { Button } from "@/components/ui/button"
@@ -513,6 +513,58 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
         })
     }
 
+    const topScrollRef = useRef<HTMLDivElement>(null)
+    const bottomScrollRef = useRef<HTMLDivElement>(null)
+    const [scrollWidth, setScrollWidth] = useState(0)
+
+    // Sync scroll positions
+    useEffect(() => {
+        const top = topScrollRef.current
+        const bottom = bottomScrollRef.current
+
+        if (!top || !bottom) return
+
+        const handleTopScroll = () => {
+            if (bottom) bottom.scrollLeft = top.scrollLeft
+        }
+
+        const handleBottomScroll = () => {
+            if (top) top.scrollLeft = bottom.scrollLeft
+        }
+
+        top.addEventListener('scroll', handleTopScroll)
+        bottom.addEventListener('scroll', handleBottomScroll)
+
+        return () => {
+            top.removeEventListener('scroll', handleTopScroll)
+            bottom.removeEventListener('scroll', handleBottomScroll)
+        }
+    }, [])
+
+    // Sync scroll width
+    useEffect(() => {
+        const checkWidth = () => {
+            if (bottomScrollRef.current) {
+                setScrollWidth(bottomScrollRef.current.scrollWidth)
+            }
+        }
+
+        checkWidth()
+        window.addEventListener('resize', checkWidth)
+
+        // Use ResizeObserver for more robust width detection
+        const observer = new ResizeObserver(checkWidth)
+        if (bottomScrollRef.current) {
+            observer.observe(bottomScrollRef.current)
+        }
+
+        return () => {
+            window.removeEventListener('resize', checkWidth)
+            observer.disconnect()
+        }
+    }, [statuses, items])
+
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Tasks - ${project.name}`} />
@@ -893,6 +945,19 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                     </Dialog>
                 </div>
 
+                {/* Top Scrollbar */}
+                <div
+                    ref={topScrollRef}
+                    className="overflow-x-auto h-4 mb-2 shrink-0"
+                    onScroll={() => {
+                        if (topScrollRef.current && bottomScrollRef.current) {
+                            bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft
+                        }
+                    }}
+                >
+                    <div style={{ width: scrollWidth, height: '1px' }}></div>
+                </div>
+
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCorners}
@@ -900,7 +965,7 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="flex gap-4 h-full overflow-x-auto pb-4 items-start">
+                    <div ref={bottomScrollRef} className="flex gap-4 h-full overflow-x-auto pb-4 items-start">
                         {statuses.map((status, index) => (
                             <TaskColumn
                                 key={status.slug}
