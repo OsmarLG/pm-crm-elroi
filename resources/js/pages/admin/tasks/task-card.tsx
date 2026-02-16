@@ -124,7 +124,7 @@ export function TaskCard({ task, user_role, currentUserId, onEdit, onDelete }: P
                 {/* View Details Modal */}
                 <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
                     <DialogContent
-                        className="max-w-3xl max-h-[85vh] flex flex-col"
+                        className="sm:max-w-5xl max-h-[85vh] flex flex-col"
                         onPointerDown={(e) => e.stopPropagation()}
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => e.stopPropagation()}

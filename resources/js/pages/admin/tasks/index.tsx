@@ -548,7 +548,7 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                                         Add Task
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0">
+                                <DialogContent className="sm:max-w-5xl max-h-[85vh] flex flex-col p-0 gap-0">
                                     <DialogHeader className="p-6 pb-2">
                                         <DialogTitle>Create New Task</DialogTitle>
                                     </DialogHeader>
@@ -687,7 +687,7 @@ export default function TaskIndex({ tasks, project, users, user_role, statuses }
                     </div>
 
                     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 bg-background">
+                        <DialogContent className="sm:max-w-5xl max-h-[85vh] flex flex-col p-0 gap-0 bg-background">
                             <DialogHeader className="p-6 pb-2">
                                 <DialogTitle>Edit Task</DialogTitle>
                             </DialogHeader>

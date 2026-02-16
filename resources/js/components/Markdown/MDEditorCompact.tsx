@@ -22,15 +22,9 @@ export default function MDEditorCompact({
     visibleDragbar,
     colorMode,
 }: Props) {
-    // ✅ elimina FULLSCREEN nativo de uiw tanto en toolbar como extra toolbar
-    const commands = React.useMemo(
-        () => getCommands().filter((cmd) => cmd.name !== "fullscreen"),
-        []
-    )
-    const extraCommands = React.useMemo(
-        () => getExtraCommands().filter((cmd) => cmd.name !== "fullscreen"),
-        []
-    )
+    // ✅ allow fullscreen
+    const commands = React.useMemo(() => getCommands(), [])
+    const extraCommands = React.useMemo(() => getExtraCommands(), [])
 
     return (
         <div
