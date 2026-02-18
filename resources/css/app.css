@@ -336,14 +336,7 @@
 /* 🔥 quita la capa que causa texto duplicado */
 /* 🔥 quita la capa que causa texto duplicado pero MANTIENE el layout */
 .md-editor-notes .w-md-editor-text-pre {
-    color: transparent !important;
-    background: transparent !important;
-}
-
-.md-editor-notes .w-md-editor-text-pre * {
-    color: transparent !important;
-    background: transparent !important;
-    -webkit-text-fill-color: transparent !important;
+    display: none !important;
 }
 
 /* deja el textarea como “source of truth” */
@@ -356,12 +349,28 @@
     text-fill-color: unset !important;
     opacity: 1 !important;
 
+    z-index: 1 !important;
+
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
 
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
 
-    z-index: 15 !important;
+    padding: 10px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.dark .md-editor-notes .w-md-editor-text textarea {
+    color: #e5e5e5 !important;
+    caret-color: #e5e5e5 !important;
 }
