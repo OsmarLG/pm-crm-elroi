@@ -45,7 +45,7 @@ class ProjectInvitationController extends Controller
                 return back()->withErrors(['email' => 'Invitation already sent to this user.']);
             }
 
-            // If found and not pending (e.g. rejected or accepted but removed), re-invite
+            // If found and not pendings (e.g. rejected or accepted but removed), re-invite
             $existingInvite->update([
                 'token' => Str::random(32),
                 'role' => $request->role,
