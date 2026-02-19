@@ -37,10 +37,23 @@ class ProjectInvitationController extends Controller
             return back()->withErrors(['email' => 'User is already a member of this project.']);
         }
 
-        // Check for pending invitation
-        $pendingInvite = $project->invitations()->where('email', $email)->where('status', 'pending')->first();
-        if ($pendingInvite) {
-            return back()->withErrors(['email' => 'Invitation already sent to this user.']);
+        // Check for existing invitation (any status)
+        $existingInvite = $project->invitations()->where('email', $email)->first();
+
+        if ($existingInvite) {
+            if ($existingInvite->status === 'pending') {
+                return back()->withErrors(['email' => 'Invitation already sent to this user.']);
+            }
+
+            // If found and not pending (e.g. rejected or accepted but removed), re-invite
+            $existingInvite->update([
+                'token' => Str::random(32),
+                'role' => $request->role,
+                'status' => 'pending',
+                'invited_by' => auth()->id(),
+            ]);
+
+            return back()->with('success', 'Invitation sent successfully.');
         }
 
         ProjectInvitation::create([
@@ -78,6 +91,15 @@ class ProjectInvitationController extends Controller
     {
         if ($invitation->email !== auth()->user()->email) {
             abort(403);
+        }
+
+        if ($invitation->status === 'accepted') {
+            return to_route('collaborations.invitations.index')->with('info', 'Invitation already accepted.');
+        }
+
+        if ($invitation->project->users()->where('user_id', auth()->id())->exists()) {
+            $invitation->update(['status' => 'accepted']);
+            return to_route('collaborations.invitations.index')->with('info', 'You are already a member of this project.');
         }
 
         DB::transaction(function () use ($invitation) {
