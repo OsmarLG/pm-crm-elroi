@@ -85,7 +85,7 @@ class ProjectInvitationController extends Controller
             $invitation->update(['status' => 'accepted']);
         });
 
-        return back()->with('success', 'Invitation accepted. You are now a member of ' . $invitation->project->name);
+        return to_route('collaborations.invitations.index')->with('success', 'Invitation accepted. You are now a member of ' . $invitation->project->name);
     }
 
     public function reject(ProjectInvitation $invitation)
