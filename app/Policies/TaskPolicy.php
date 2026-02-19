@@ -9,11 +9,23 @@ use Illuminate\Auth\Access\Response;
 class TaskPolicy
 {
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->hasRole('master')) {
+            return true;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +33,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return false;
+        return $user->projects()->where('project_id', $task->project_id)->exists();
     }
 
     /**
@@ -29,7 +41,7 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true; // Checked at controller level usually with project_id
     }
 
     /**
@@ -37,7 +49,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return false;
+        return $user->projects()->where('project_id', $task->project_id)->exists();
     }
 
     /**
@@ -45,7 +57,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return false;
+        return $user->projects()->where('project_id', $task->project_id)->exists();
     }
 
     /**

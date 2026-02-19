@@ -15,6 +15,9 @@ class TaskController extends Controller
 
         $project = \App\Models\Project::with(['customer', 'users', 'taskStatuses'])->findOrFail($request->project_id);
 
+        // Authorization Check
+        $this->authorize('view', $project);
+
         $tasksQuery = \App\Models\Task::with(['assignee', 'project.customer', 'status'])
             ->where('project_id', $project->id)
             ->orderBy('order_column');
@@ -32,15 +35,19 @@ class TaskController extends Controller
         // Only get users who are members of this project
         $users = $project->users()->select('users.id', 'users.name')->get();
 
-        $member = $project->users()->where('user_id', $currentUser->id)->first();
-        if ($member) {
-            $userRole = $member->pivot->role;
+        if ($currentUser->hasRole('master')) {
+            $userRole = 'owner';
+        } else {
+            $member = $project->users()->where('user_id', $currentUser->id)->first();
+            if ($member) {
+                $userRole = $member->pivot->role;
+            }
         }
 
         return inertia('admin/tasks/index', [
             'tasks' => $tasks,
             'project' => $project,
-            'users' => $users,
+            'users' => $users, // This list of users is safe to show to members
             'user_role' => $userRole,
             'statuses' => $project->taskStatuses, // Pass dynamic statuses to frontend
         ]);
@@ -48,6 +55,8 @@ class TaskController extends Controller
 
     public function updateStatus(\Illuminate\Http\Request $request, \App\Models\Task $task)
     {
+        $this->authorize('update', $task);
+
         $validated = $request->validate([
             'status' => 'required|string', // This is the slug
             'order_column' => 'required|integer',
@@ -87,6 +96,8 @@ class TaskController extends Controller
         ]);
 
         $project = \App\Models\Project::findOrFail($validated['project_id']);
+        $this->authorize('view', $project); // Must be member to add task
+
         $statusModel = $project->taskStatuses()->where('slug', $validated['status'])->firstOrFail();
 
         $data = $validated;
@@ -100,6 +111,8 @@ class TaskController extends Controller
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Task $task)
     {
+        $this->authorize('update', $task);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -133,6 +146,8 @@ class TaskController extends Controller
 
     public function destroy(\App\Models\Task $task)
     {
+        $this->authorize('delete', $task);
+
         $task->delete();
 
         return back()->with('success', 'Task deleted successfully.');

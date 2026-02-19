@@ -9,7 +9,16 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = \App\Models\Project::with('customer')->latest()->paginate(10);
+        $user = auth()->user();
+        $query = \App\Models\Project::with('customer')->latest();
+
+        if (!$user->hasRole('master')) {
+            $query->whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        $projects = $query->paginate(10);
         return inertia('admin/projects/index', ['projects' => $projects]);
     }
 
@@ -41,6 +50,8 @@ class ProjectController extends Controller
 
     public function edit(\App\Models\Project $project)
     {
+        $this->authorize('update', $project);
+
         $project->load([
             'users',
             'invitations' => function ($query) {
@@ -52,9 +63,13 @@ class ProjectController extends Controller
         $currentUser = auth()->user();
         $userRole = 'member';
 
-        $member = $project->users->where('id', $currentUser->id)->first();
-        if ($member) {
-            $userRole = $member->pivot->role;
+        if ($currentUser->hasRole('master')) {
+            $userRole = 'owner'; // Treat master as owner for UI purposes
+        } else {
+            $member = $project->users->where('id', $currentUser->id)->first();
+            if ($member) {
+                $userRole = $member->pivot->role;
+            }
         }
 
         // Only pass confidential_info to owners
@@ -72,6 +87,8 @@ class ProjectController extends Controller
 
     public function update(\Illuminate\Http\Request $request, \App\Models\Project $project)
     {
+        $this->authorize('update', $project);
+
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'name' => 'required|string|max:255',
@@ -89,6 +106,8 @@ class ProjectController extends Controller
 
     public function destroy(\App\Models\Project $project)
     {
+        $this->authorize('delete', $project);
+
         $project->delete();
         return redirect()->route('admin.projects.index')->with('success', 'Project deleted successfully.');
     }
