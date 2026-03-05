@@ -1,6 +1,12 @@
 [phases.setup]
 nixPkgs = ["...", "python311Packages.supervisor"]
 
+[variables]
+NIXPACKS_PHP_ROOT_DIR="/app/public"
+IS_LARAVEL="true"
+NIXPACKS_PHP_FALLBACK_PATH="/index.php"
+APP_ENV="production"
+
 [phases.build]
 cmds = [
     "npm run build:ssr",
@@ -177,6 +183,7 @@ http {
         location ~ \.php$ {
             fastcgi_pass 127.0.0.1:9000;
             fastcgi_buffer_size 8k;
+            fastcgi_buffers 16 8k;
             fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
             include $!{nginx}/conf/fastcgi_params;
             include $!{nginx}/conf/fastcgi.conf;
