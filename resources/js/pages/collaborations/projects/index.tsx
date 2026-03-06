@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { FolderOpen } from "lucide-react"
-
-// @ts-ignore
-const route = window.route;
+import { route } from "ziggy-js"
 
 type Customer = {
     id: number

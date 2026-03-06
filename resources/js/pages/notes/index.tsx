@@ -263,24 +263,28 @@ export default function NotesPage(props: PageProps) {
           </div>
 
           {/* middle */}
-          <div className="col-span-12 md:col-span-8 lg:col-span-4 space-y-3">
-            <NoteList
-              notes={visibleNotes}
-              folders={foldersArray}
-              activeNoteId={activeNoteId}
-              onSelect={onSelectNote}
-              onEdit={onEditNote}
-              onCreate={onCreateNote}
-              onDelete={onDeleteNote}
-              onBulkDelete={onBulkDeleteNotes}
-            />
+          <div className="col-span-12 md:col-span-8 lg:col-span-4 flex flex-col min-w-0 space-y-3">
+            <div className="flex-1 min-h-0">
+              <NoteList
+                notes={visibleNotes}
+                folders={foldersArray}
+                activeNoteId={activeNoteId}
+                onSelect={onSelectNote}
+                onEdit={onEditNote}
+                onCreate={onCreateNote}
+                onDelete={onDeleteNote}
+                onBulkDelete={onBulkDeleteNotes}
+              />
+            </div>
 
             {shouldShowPagination && paginatedNotes && (
-              <InertiaPagination
-                metaLinks={paginatedNotes.meta.links}
-                prevUrl={paginatedNotes.links.prev}
-                nextUrl={paginatedNotes.links.next}
-              />
+              <div className="mt-auto pt-2 border-t bg-background/50 sticky bottom-0">
+                <InertiaPagination
+                  metaLinks={paginatedNotes.meta.links}
+                  prevUrl={paginatedNotes.links.prev}
+                  nextUrl={paginatedNotes.links.next}
+                />
+              </div>
             )}
           </div>
 

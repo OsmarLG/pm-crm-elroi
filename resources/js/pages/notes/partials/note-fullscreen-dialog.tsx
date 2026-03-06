@@ -79,6 +79,10 @@ export function NoteFullscreenDialog({
             flex flex-col
           "
                 >
+                    <DialogPrimitive.Title className="sr-only">
+                        {localTitle || "Note Fullscreen Editor"}
+                    </DialogPrimitive.Title>
+
                     {/* Header */}
                     <div className="h-14 shrink-0 px-4 border-b flex items-center justify-between">
                         <div className="min-w-0">
