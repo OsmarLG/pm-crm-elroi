@@ -11,6 +11,7 @@ APP_ENV="production"
 cmds = [
     "npm run build",
     "npm run build:ssr",
+    "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/framework/testing",
     "mkdir -p /etc/supervisor/conf.d/",
     "cp /assets/worker-*.conf /etc/supervisor/conf.d/",
     "cp /assets/supervisord.conf /etc/supervisord.conf",
