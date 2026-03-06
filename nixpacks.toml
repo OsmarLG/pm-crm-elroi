@@ -29,6 +29,9 @@ cmd = '/assets/start.sh'
 # Transform the nginx configuration
 node /assets/scripts/prestart.mjs /assets/nginx.template.conf /etc/nginx.conf
 
+# Ensure storage directories exist (at runtime for volumes)
+mkdir -p /app/storage/framework/sessions /app/storage/framework/views /app/storage/framework/cache /app/storage/framework/testing /app/storage/logs /app/storage/app/public
+
 # Start supervisor
 supervisord -c /etc/supervisord.conf -n
 '''
