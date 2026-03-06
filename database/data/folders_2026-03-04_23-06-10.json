@@ -1,0 +1,352 @@
+[{
+    "id": 1,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Work",
+    "created_at": "2026-01-06 09:54:05",
+    "updated_at": "2026-01-06 09:54:05"
+},
+{
+    "id": 2,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "Nuts",
+    "created_at": "2026-01-06 09:54:17",
+    "updated_at": "2026-01-06 09:54:17"
+},
+{
+    "id": 3,
+    "user_id": 1,
+    "parent_id": 2,
+    "name": "Asturiano",
+    "created_at": "2026-01-06 09:54:27",
+    "updated_at": "2026-01-06 09:54:27"
+},
+{
+    "id": 4,
+    "user_id": 1,
+    "parent_id": 2,
+    "name": "Maraton",
+    "created_at": "2026-01-06 09:54:32",
+    "updated_at": "2026-01-06 09:54:32"
+},
+{
+    "id": 5,
+    "user_id": 1,
+    "parent_id": 2,
+    "name": "Shasa",
+    "created_at": "2026-01-06 09:54:36",
+    "updated_at": "2026-01-06 09:54:36"
+},
+{
+    "id": 6,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "GitHub",
+    "created_at": "2026-01-06 10:21:09",
+    "updated_at": "2026-01-06 10:21:09"
+},
+{
+    "id": 8,
+    "user_id": 1,
+    "parent_id": 6,
+    "name": "CICD",
+    "created_at": "2026-01-06 10:21:28",
+    "updated_at": "2026-01-06 10:21:28"
+},
+{
+    "id": 9,
+    "user_id": 1,
+    "parent_id": 8,
+    "name": "Laravel",
+    "created_at": "2026-01-06 10:21:31",
+    "updated_at": "2026-01-06 10:21:31"
+},
+{
+    "id": 10,
+    "user_id": 1,
+    "parent_id": 9,
+    "name": "V12",
+    "created_at": "2026-01-06 10:21:39",
+    "updated_at": "2026-01-06 10:21:39"
+},
+{
+    "id": 11,
+    "user_id": 1,
+    "parent_id": 10,
+    "name": "React Starter Kit",
+    "created_at": "2026-01-06 10:21:48",
+    "updated_at": "2026-01-06 10:21:48"
+},
+{
+    "id": 12,
+    "user_id": 4,
+    "parent_id": null,
+    "name": "AVT",
+    "created_at": "2026-01-06 18:57:42",
+    "updated_at": "2026-01-06 18:57:42"
+},
+{
+    "id": 14,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "AVT",
+    "created_at": "2026-01-06 19:09:39",
+    "updated_at": "2026-01-06 19:09:39"
+},
+{
+    "id": 15,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "AMF",
+    "created_at": "2026-01-06 19:09:45",
+    "updated_at": "2026-01-06 19:09:45"
+},
+{
+    "id": 16,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "N8N",
+    "created_at": "2026-01-07 10:45:07",
+    "updated_at": "2026-01-07 10:45:07"
+},
+{
+    "id": 17,
+    "user_id": 1,
+    "parent_id": 16,
+    "name": "API Keys",
+    "created_at": "2026-01-07 10:45:13",
+    "updated_at": "2026-01-07 10:45:13"
+},
+{
+    "id": 18,
+    "user_id": 1,
+    "parent_id": 4,
+    "name": "SQL",
+    "created_at": "2026-01-07 11:26:21",
+    "updated_at": "2026-01-07 11:26:21"
+},
+{
+    "id": 19,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "Self",
+    "created_at": "2026-01-07 15:49:18",
+    "updated_at": "2026-01-07 15:49:18"
+},
+{
+    "id": 20,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Church",
+    "created_at": "2026-01-07 17:14:37",
+    "updated_at": "2026-01-07 17:14:37"
+},
+{
+    "id": 21,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Profetas",
+    "created_at": "2026-01-07 17:15:03",
+    "updated_at": "2026-01-07 17:15:03"
+},
+{
+    "id": 22,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Ideas",
+    "created_at": "2026-01-07 18:59:58",
+    "updated_at": "2026-01-07 18:59:58"
+},
+{
+    "id": 23,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Arcas",
+    "created_at": "2026-01-07 19:03:22",
+    "updated_at": "2026-01-07 19:03:22"
+},
+{
+    "id": 24,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "SAPA",
+    "created_at": "2026-01-08 06:20:56",
+    "updated_at": "2026-01-08 06:20:56"
+},
+{
+    "id": 25,
+    "user_id": 1,
+    "parent_id": 24,
+    "name": "PORTAL SAPA",
+    "created_at": "2026-01-08 06:21:08",
+    "updated_at": "2026-01-08 06:21:08"
+},
+{
+    "id": 26,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Alabanza",
+    "created_at": "2026-01-08 17:57:11",
+    "updated_at": "2026-01-08 17:57:11"
+},
+{
+    "id": 27,
+    "user_id": 1,
+    "parent_id": 26,
+    "name": "Sax",
+    "created_at": "2026-01-08 17:57:16",
+    "updated_at": "2026-01-08 17:57:16"
+},
+{
+    "id": 29,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Remas",
+    "created_at": "2026-01-08 21:11:47",
+    "updated_at": "2026-01-08 21:11:47"
+},
+{
+    "id": 31,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Predicas",
+    "created_at": "2026-01-09 11:22:39",
+    "updated_at": "2026-01-09 11:22:39"
+},
+{
+    "id": 33,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Supabase",
+    "created_at": "2026-01-10 00:07:52",
+    "updated_at": "2026-01-10 00:07:52"
+},
+{
+    "id": 34,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Lideres",
+    "created_at": "2026-01-10 08:40:06",
+    "updated_at": "2026-01-10 08:40:06"
+},
+{
+    "id": 35,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Osmarsito",
+    "created_at": "2026-01-12 19:08:18",
+    "updated_at": "2026-01-12 19:08:18"
+},
+{
+    "id": 36,
+    "user_id": 1,
+    "parent_id": 23,
+    "name": "Arca Revoluci\u00f3n",
+    "created_at": "2026-01-12 19:57:33",
+    "updated_at": "2026-01-12 19:57:33"
+},
+{
+    "id": 37,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Genesis",
+    "created_at": "2026-01-13 20:33:30",
+    "updated_at": "2026-01-13 20:33:30"
+},
+{
+    "id": 38,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Lectura",
+    "created_at": "2026-01-14 14:04:24",
+    "updated_at": "2026-01-14 14:04:24"
+},
+{
+    "id": 39,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Evangelismo",
+    "created_at": "2026-01-14 14:15:40",
+    "updated_at": "2026-01-14 14:15:40"
+},
+{
+    "id": 40,
+    "user_id": 1,
+    "parent_id": 1,
+    "name": "El Impostor Cristiano",
+    "created_at": "2026-01-15 09:24:45",
+    "updated_at": "2026-01-15 09:24:45"
+},
+{
+    "id": 41,
+    "user_id": 1,
+    "parent_id": 27,
+    "name": "Tutoriales",
+    "created_at": "2026-01-15 16:08:28",
+    "updated_at": "2026-01-15 16:08:28"
+},
+{
+    "id": 43,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Videos",
+    "created_at": "2026-01-15 22:50:30",
+    "updated_at": "2026-01-15 22:50:30"
+},
+{
+    "id": 44,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Misericordia",
+    "created_at": "2026-01-20 20:52:14",
+    "updated_at": "2026-01-20 20:52:14"
+},
+{
+    "id": 45,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Personal",
+    "created_at": "2026-01-27 15:00:28",
+    "updated_at": "2026-01-27 15:00:28"
+},
+{
+    "id": 47,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "Negocios",
+    "created_at": "2026-02-02 18:56:43",
+    "updated_at": "2026-02-02 18:56:43"
+},
+{
+    "id": 48,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Canciones",
+    "created_at": "2026-02-11 22:10:34",
+    "updated_at": "2026-02-11 22:10:34"
+},
+{
+    "id": 49,
+    "user_id": 1,
+    "parent_id": 16,
+    "name": "Prompts",
+    "created_at": "2026-02-12 12:03:38",
+    "updated_at": "2026-02-12 12:03:38"
+},
+{
+    "id": 50,
+    "user_id": 1,
+    "parent_id": 20,
+    "name": "SERVICIOS",
+    "created_at": "2026-02-15 10:00:27",
+    "updated_at": "2026-02-15 10:00:27"
+},
+{
+    "id": 51,
+    "user_id": 1,
+    "parent_id": null,
+    "name": "Familia",
+    "created_at": "2026-02-18 20:35:20",
+    "updated_at": "2026-02-18 20:35:20"
+}]

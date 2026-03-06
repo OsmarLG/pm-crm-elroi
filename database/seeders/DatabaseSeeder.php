@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Database\Seeders\RolesAndUsersSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,19 +15,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::firstOrCreate(
-        //     ['email' => 'lieragomezosmaralejandro@gmail.com'],
-        //     [
-        //         'name' => 'Osmar Liera',
-        //         'password' => 'password',
-        //         'email_verified_at' => now(),
-        //     ]
-        // );
+        Schema::disableForeignKeyConstraints();
 
         $this->call([
-            RolesAndUsersSeeder::class,
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            UserSeeder::class,
+            SpatiePivotSeeder::class,
+            CustomerSeeder::class,
+            ProjectSeeder::class,
+            ProjectUserSeeder::class,
+            ProjectInvitationSeeder::class,
+            TaskStatusSeeder::class,
+            TaskSeeder::class,
+            FolderSeeder::class,
+                // FileItemSeeder::class,
+            FileFolderSeeder::class,
+            NoteSeeder::class,
+            AiModelSeeder::class,
+            AiConfigurationSeeder::class,
         ]);
+
+        Schema::enableForeignKeyConstraints();
     }
 }

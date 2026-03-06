@@ -6,26 +6,26 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class TaskSeeder extends Seeder
+class AiModelSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $file = glob(database_path('data/tasks_*.json'))[0] ?? null;
+        $file = glob(database_path('data/ai_models_*.json'))[0] ?? null;
         if (!$file)
             return;
 
         $data = json_decode(file_get_contents($file), true);
-        $columns = Schema::getColumnListing('tasks');
+        $columns = Schema::getColumnListing('ai_models');
 
         foreach (array_chunk($data, 100) as $chunk) {
             $filteredChunk = array_map(function ($row) use ($columns) {
                 return array_intersect_key($row, array_flip($columns));
             }, $chunk);
 
-            DB::table('tasks')->insert($filteredChunk);
+            DB::table('ai_models')->insert($filteredChunk);
         }
     }
 }

@@ -1,0 +1,120 @@
+[{
+    "id": 1,
+    "migration": "0001_01_01_000000_create_users_table",
+    "batch": 1
+},
+{
+    "id": 2,
+    "migration": "0001_01_01_000001_create_cache_table",
+    "batch": 1
+},
+{
+    "id": 3,
+    "migration": "0001_01_01_000002_create_jobs_table",
+    "batch": 1
+},
+{
+    "id": 4,
+    "migration": "2025_08_26_100418_add_two_factor_columns_to_users_table",
+    "batch": 1
+},
+{
+    "id": 5,
+    "migration": "2025_12_31_210637_create_folders_table",
+    "batch": 1
+},
+{
+    "id": 6,
+    "migration": "2025_12_31_210642_create_notes_table",
+    "batch": 1
+},
+{
+    "id": 7,
+    "migration": "2026_01_02_154101_create_permission_tables",
+    "batch": 1
+},
+{
+    "id": 8,
+    "migration": "2026_01_05_175649_create_file_folders_table",
+    "batch": 1
+},
+{
+    "id": 9,
+    "migration": "2026_01_05_175722_create_files_table",
+    "batch": 1
+},
+{
+    "id": 10,
+    "migration": "2026_01_07_160000_add_visibility_and_uuid_to_notes_and_files",
+    "batch": 2
+},
+{
+    "id": 11,
+    "migration": "2026_01_07_163000_backfill_uuids",
+    "batch": 2
+},
+{
+    "id": 12,
+    "migration": "2026_02_12_140138_create_ai_configurations_table",
+    "batch": 3
+},
+{
+    "id": 13,
+    "migration": "2026_02_12_170555_create_ai_models_table",
+    "batch": 4
+},
+{
+    "id": 14,
+    "migration": "2026_02_12_173109_create_customers_table",
+    "batch": 5
+},
+{
+    "id": 15,
+    "migration": "2026_02_12_173116_create_projects_table",
+    "batch": 5
+},
+{
+    "id": 16,
+    "migration": "2026_02_12_173128_create_tasks_table",
+    "batch": 5
+},
+{
+    "id": 17,
+    "migration": "2026_02_12_180357_add_start_date_to_tasks_table",
+    "batch": 5
+},
+{
+    "id": 18,
+    "migration": "2026_02_12_222746_add_priority_and_result_to_tasks_table",
+    "batch": 5
+},
+{
+    "id": 19,
+    "migration": "2026_02_12_230221_create_project_user_table",
+    "batch": 6
+},
+{
+    "id": 20,
+    "migration": "2026_02_12_233134_create_project_invitations_table",
+    "batch": 6
+},
+{
+    "id": 21,
+    "migration": "2026_02_13_001012_add_completed_at_to_tasks_table",
+    "batch": 7
+},
+{
+    "id": 22,
+    "migration": "2026_02_13_003658_create_task_statuses_table",
+    "batch": 8
+},
+{
+    "id": 23,
+    "migration": "2026_02_13_003713_add_task_status_id_to_tasks_table",
+    "batch": 8
+},
+{
+    "id": 24,
+    "migration": "2026_02_13_020736_add_confidential_info_to_projects_table",
+    "batch": 9
+}]

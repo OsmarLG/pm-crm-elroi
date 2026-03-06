@@ -1,0 +1,18 @@
+[{
+    "id": 1,
+    "provider": "openai",
+    "api_key": "eyJpdiI6Ik9YWXJoODdLeldCdVN1RVJLd2owdnc9PSIsInZhbHVlIjoiRFhMQzFkejNNcGdGQ1VJdW5FODFvdlJGTEF6dGd3bDFUSlJrK25mL3BwNmY0NDhOSFlxNnVkNTR1SU03QnlMYXlNOHNtNUtuL2Qvay8vMkpoTjBiY3FGeDNVSGdTVjV0SU5oY0dNSkhLZy9zdG5YZGhHblQ4ME02VEdiaG5vSGVkbGlzcHZONjVzOGNjb0QzMVNIMXV4TXd5RFoxTXgwNVVPOSt1QnU0Z3U2YVl3bmU5UTJoWXVJbUZObUUreCt0NzhZbWhsWWlvT0hPRTM1azMwcTg2c2x3WnVPQkpZcGh0cCtQZkVPQ0xjTT0iLCJtYWMiOiJiZDZiMDIyNmZmOGM2MzFiMzc4YmZhNzM4MTBhZjA3OWY4OWIyMTI4OTRmMjQ1NGRmZGIzM2QzZTRiZDNhMzhlIiwidGFnIjoiIn0=",
+    "is_active": 0,
+    "meta": "{\"note_refactor_prompt\":\"Refactoriza el formato y la estructura, NO cambies el significado ni agregues informaci\\u00f3n nueva, solo organiza mejor lo que ya existe.\",\"note_improve_prompt\":\"Mejora el contenido expandiendo ideas clave, corrigiendo gram\\u00e1tica y mejorando el tono para que sea m\\u00e1s profesional y \\u00fatil.\",\"project_id\":\"proj_NQf9NZm6i7NLzi4jLtL0KTUF\"}",
+    "created_at": "2026-02-12 15:33:11",
+    "updated_at": "2026-02-12 17:24:09"
+},
+{
+    "id": 2,
+    "provider": "gemini",
+    "api_key": "eyJpdiI6ImVwWUtCVWJNQTdSYmZuS1RjMkNyTFE9PSIsInZhbHVlIjoiNFlEeGJ3K3dMeWVVMnRTWlVNN2JDSHp2QnlweGVPVGlqeHdUMVN4L3llMGRqUXdmQ3BLYU5wWW5OeU9zdWR1SiIsIm1hYyI6IjEzOTYyZDBmMWI2MTFjMGM0MmRjZThiOWZjMmM5NDY5ZjM5ODNjN2Q4YTViYTA5ZTFjMTE0YjM5NzVhNDljYTgiLCJ0YWciOiIifQ==",
+    "is_active": 1,
+    "meta": "{\"note_refactor_prompt\":\"Refactoriza el formato y la estructura, NO cambies el significado ni agregues informaci\\u00f3n nueva, solo organiza mejor lo que ya existe.\",\"note_improve_prompt\":\"Mejora el contenido expandiendo ideas clave, corrigiendo gram\\u00e1tica y mejorando el tono para que sea m\\u00e1s profesional y \\u00fatil.\"}",
+    "created_at": "2026-02-12 15:33:28",
+    "updated_at": "2026-02-12 17:22:24"
+}]

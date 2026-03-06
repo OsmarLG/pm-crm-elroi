@@ -54,16 +54,19 @@ const adminNavItems: NavItem[] = [
         title: "CRM",
         icon: Users,
         href: "/admin/customers",
+        can: "customers.view",
         children: [
             {
                 title: "Customers",
                 href: "/admin/customers",
                 icon: Users,
+                can: "customers.view",
             },
             {
                 title: "Projects",
                 href: "/admin/projects",
                 icon: Folder,
+                can: "projects.view",
             },
         ],
     },
@@ -145,6 +148,7 @@ export function AppSidebar() {
                     // @ts-ignore
                     href: window.route('collaborations.projects.index'),
                     icon: Folder,
+                    can: "projects.view",
                 },
                 {
                     title: "Invitations",

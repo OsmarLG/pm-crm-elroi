@@ -1,0 +1,54 @@
+[{
+    "id": 1,
+    "name": "Araceli Fernandez \/ Meza Fernandez",
+    "email": "ara@loscabosmfarquitectos.com",
+    "phone": "+52 1 624 160 1765",
+    "address": "Los Cabos, Baja California Sur, M\u00e9xico",
+    "created_at": "2026-02-13 01:45:43",
+    "updated_at": "2026-02-13 01:45:43"
+},
+{
+    "id": 2,
+    "name": "Dora Alicia \/ Productos NopalGreen",
+    "email": null,
+    "phone": "+52 1 667 489 4944",
+    "address": "Sonora, Baja California Sur",
+    "created_at": "2026-02-13 01:48:30",
+    "updated_at": "2026-02-13 01:51:10"
+},
+{
+    "id": 3,
+    "name": "ELROI",
+    "email": "elroigenesis1613contacto@gmail.com",
+    "phone": "+526151559659",
+    "address": "Hilario Perez 151, Revoluci\u00f3n II, 23075, La Paz, La Paz, BCS, M\u00e9xico",
+    "created_at": "2026-02-13 01:53:39",
+    "updated_at": "2026-02-13 01:53:39"
+},
+{
+    "id": 4,
+    "name": "ICATEBCS",
+    "email": "pending@gmail.com",
+    "phone": "+526121316994",
+    "address": "Ignacio Altamirano y 5 de Febrero",
+    "created_at": "2026-02-17 19:14:30",
+    "updated_at": "2026-02-17 19:14:30"
+},
+{
+    "id": 5,
+    "name": "Midia Aguilar",
+    "email": "midia10aguilar@gmail.com",
+    "phone": "+5216151127548",
+    "address": "Hilario Perez 151",
+    "created_at": "2026-02-18 00:04:06",
+    "updated_at": "2026-02-18 00:04:06"
+},
+{
+    "id": 6,
+    "name": "Edgar Vega",
+    "email": null,
+    "phone": "6122143230",
+    "address": null,
+    "created_at": "2026-02-19 08:47:19",
+    "updated_at": "2026-02-19 08:47:19"
+}]

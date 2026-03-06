@@ -1,0 +1,198 @@
+[
+    {
+        "id": 1,
+        "name": "users.view",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 2,
+        "name": "users.create",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 3,
+        "name": "users.update",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 4,
+        "name": "users.delete",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 5,
+        "name": "notes.view",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 6,
+        "name": "notes.create",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 7,
+        "name": "notes.update",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 8,
+        "name": "notes.delete",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:25",
+        "updated_at": "2026-01-06 09:47:25"
+    },
+    {
+        "id": 9,
+        "name": "folders.manage",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 10,
+        "name": "files.view",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 11,
+        "name": "files.create",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 12,
+        "name": "files.update",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 13,
+        "name": "files.delete",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 14,
+        "name": "folders_files.manage",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 15,
+        "name": "roles.manage",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 16,
+        "name": "permissions.manage",
+        "guard_name": "web",
+        "created_at": "2026-01-06 09:47:26",
+        "updated_at": "2026-01-06 09:47:26"
+    },
+    {
+        "id": 17,
+        "name": "customers.view",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 18,
+        "name": "customers.create",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 19,
+        "name": "customers.update",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 20,
+        "name": "customers.delete",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 21,
+        "name": "projects.view",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 22,
+        "name": "projects.create",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 23,
+        "name": "projects.update",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 24,
+        "name": "projects.delete",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 25,
+        "name": "tasks.view",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 26,
+        "name": "tasks.create",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 27,
+        "name": "tasks.update",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    },
+    {
+        "id": 28,
+        "name": "tasks.delete",
+        "guard_name": "web",
+        "created_at": "2026-03-05 20:28:00",
+        "updated_at": "2026-03-05 20:28:00"
+    }
+]
