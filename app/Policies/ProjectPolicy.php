@@ -66,6 +66,18 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can manage project members.
+     */
+    public function manageMembers(User $user, Project $project): bool
+    {
+        // Only owners and admins can manage members
+        return $project->users()
+            ->where('user_id', $user->id)
+            ->whereIn('project_user.role', ['owner', 'admin'])
+            ->exists();
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Project $project): bool

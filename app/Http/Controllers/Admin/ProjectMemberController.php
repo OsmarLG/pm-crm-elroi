@@ -61,6 +61,8 @@ class ProjectMemberController extends Controller
 
     public function destroy(Project $project, User $member)
     {
+        $this->authorize('manageMembers', $project);
+
         // Ensure we have the user with pivot data
         $projectMember = $project->users()->where('user_id', $member->id)->first();
 
@@ -74,25 +76,14 @@ class ProjectMemberController extends Controller
         }
 
         // Reassign tasks to another owner
-        // Find an owner who is NOT the member being removed
         $newOwner = $project->users()
             ->wherePivot('role', 'owner')
             ->where('users.id', '!=', $member->id)
             ->first();
 
-        // If no other owner found (e.g. only one owner and we are removing a member), pick any other admin or member?
-        // Requirement was "assign to the owner". If the removed user is NOT the ONLY owner, there should be another owner.
-        // If the removed user was a member, any owner is fine.
-
+        // Fallback: Use the project creator or any other owner if for some reason $newOwner is null
+        // but we already checked that there's at least one other owner if the removed user was an owner.
         if (!$newOwner) {
-            // Fallback: If no other owner exists (which shouldn't happen if we are removing a member and an owner exists),
-            // try to find the project creator or any admin. 
-            // Ideally we should always have at least one owner.
-            // If $projectMember is 'member', there must be an 'owner'. 
-            // If $projectMember is 'owner', we checked count > 1, so there must be another.
-            // So $newOwner should theoretically be found unless data integrity is compromised.
-
-            // Let's just pick the first user with 'owner' role.
             $newOwner = $project->users()->wherePivot('role', 'owner')->first();
         }
 
