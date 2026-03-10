@@ -19,9 +19,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Plus, Pencil, Trash2, FolderOpen } from "lucide-react"
+import { Plus, Pencil, Trash2, FolderOpen, Search, Filter, X } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
 // @ts-ignore
 const route = window.route;
@@ -46,20 +56,60 @@ type Props = {
     projects: {
         data: Project[]
         links: any[]
+        meta: any
+    }
+    customers: Customer[]
+    filters: {
+        search?: string
+        status?: string
+        customer_id?: number
+        sort?: string
+        dir?: string
     }
 }
 
 const statusColors: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     pending: "secondary",
     in_progress: "default",
-    completed: "outline", // using outline for success-ish look if needed, or default
+    completed: "outline",
     on_hold: "secondary",
     cancelled: "destructive",
 }
 
-export default function ProjectIndex({ projects }: Props) {
+export default function ProjectIndex({ projects, customers, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || "")
+    const [status, setStatus] = useState(filters.status || "all")
+    const [customerId, setCustomerId] = useState(filters.customer_id?.toString() || "all")
+    const [urgency, setUrgency] = useState(filters.sort === "due_date" && filters.dir === "asc")
     const [projectToDelete, setProjectToDelete] = useState<number | null>(null)
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
+    const handleFilter = () => {
+        const query: any = {}
+        if (search) query.search = search
+        if (status !== "all") query.status = status
+        if (customerId !== "all") query.customer_id = customerId
+        if (urgency) {
+            query.sort = "due_date"
+            query.dir = "asc"
+        }
+
+        router.get(route("admin.projects.index"), query, {
+            preserveState: true,
+            replace: true,
+        })
+    }
+
+    const clearFilters = () => {
+        setSearch("")
+        setStatus("all")
+        setCustomerId("all")
+        setUrgency(false)
+        router.get(route("admin.projects.index"), {}, {
+            preserveState: true,
+            replace: true,
+        })
+    }
 
     const handleDelete = (id: number) => {
         setProjectToDelete(id)
@@ -101,6 +151,77 @@ export default function ProjectIndex({ projects }: Props) {
                             Add Project
                         </Link>
                     </Button>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 items-end bg-card p-4 rounded-md border">
+                    <div className="space-y-2">
+                        <Label htmlFor="search">Project Name</Label>
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                id="search"
+                                placeholder="Search projects..."
+                                className="pl-8"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleFilter()}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Status</Label>
+                        <Select value={status} onValueChange={setStatus}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="All Statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Statuses</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="in_progress">In Progress</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="on_hold">On Hold</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Customer</Label>
+                        <Select value={customerId} onValueChange={setCustomerId}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="All Customers" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Customers</SelectItem>
+                                {customers.map((c) => (
+                                    <SelectItem key={c.id} value={c.id.toString()}>
+                                        {c.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                id="urgency"
+                                checked={urgency}
+                                onCheckedChange={setUrgency}
+                            />
+                            <Label htmlFor="urgency" className="cursor-pointer">Urgency</Label>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="icon" onClick={clearFilters} title="Clear Filters">
+                                <X className="h-4 w-4" />
+                            </Button>
+                            <Button onClick={handleFilter}>
+                                <Filter className="h-4 w-4 mr-2" />
+                                Filter
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="rounded-md border bg-card overflow-hidden">

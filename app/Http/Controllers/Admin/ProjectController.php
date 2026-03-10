@@ -7,19 +7,21 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function __construct(protected \App\Services\Admin\ProjectService $projectService) {}
+
+    public function index(\App\Http\Requests\Admin\Projects\ProjectIndexRequest $request)
     {
-        $user = auth()->user();
-        $query = \App\Models\Project::with('customer')->latest();
+        $filters = $request->validatedFilters();
+        $paginator = $this->projectService->paginate(auth()->user(), $filters);
+        
+        $projects = \App\Http\Resources\Admin\Projects\ProjectResource::collection($paginator);
+        $customers = \App\Models\Customer::select('id', 'name')->orderBy('name')->get();
 
-        if (!$user->hasRole('master')) {
-            $query->whereHas('users', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-        }
-
-        $projects = $query->paginate(10);
-        return inertia('admin/projects/index', ['projects' => $projects]);
+        return inertia('admin/projects/index', [
+            'projects' => $projects,
+            'customers' => $customers,
+            'filters' => $filters,
+        ]);
     }
 
     public function create()
